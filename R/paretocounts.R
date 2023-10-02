@@ -75,7 +75,7 @@ paretocounts <- function(){custom_family(
   type = "real",
   vars = c("vreal1[n]",
            "vreal2[n]",
-           "vreal3[n]"),
+           "vreal3[n]")
   # posterior_predict = posterior_predict_paretocounts,
   # posterior_epred = posterior_epred_paretocounts,
   # log_lik = log_lik_paretocounts
