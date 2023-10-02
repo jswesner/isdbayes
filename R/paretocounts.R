@@ -1,10 +1,7 @@
-#' @import brms
-#' @import stats
-#' @import utils
 
 utils::globalVariables(c("x", "vreal2", "vreal3"))
 
-#' @export
+
 rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
   samples <- numeric(n)
   {
@@ -20,7 +17,7 @@ rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
   return(samples)
 }
 
-#' @export
+
 dparetocounts <- function(x, mu, vreal2, vreal3) {
   if (vreal2 <= 0 || vreal2 >= vreal3)
     stop("Parameters out of bounds in dPLB")
@@ -37,9 +34,9 @@ dparetocounts <- function(x, mu, vreal2, vreal3) {
   density
 }
 
-#' @export
+
 log_lik_paretocounts <- function(i, prep) {
-  mu <- brms::get_dpar(prep, "mu", i = i)
+  mu <- get_dpar(prep, "mu", i = i)
   vreal1 <- prep$data$vreal1[i]
   vreal2 <- prep$data$vreal2[i]
   vreal3 <- prep$data$vreal3[i]
@@ -47,15 +44,13 @@ log_lik_paretocounts <- function(i, prep) {
   paretocounts_lpdf(Y, mu, vreal1, vreal2, vreal3)
 }
 
-#' @export
 posterior_predict_paretocounts <- function(i, prep, ...) {
-  mu <- brms::get_dpar(prep, "mu", i = i)
+  mu <- get_dpar(prep, "mu", i = i)
   vreal2 = prep$data$vreal2[i]
   vreal3 = prep$data$vreal3[i]
   rparetocounts(prep$ndraws, mu, vreal2, vreal3)
 }
 
-#' @export
 posterior_epred_paretocounts <- function(prep) {
   mu <- prep$dpars$mu
   return(mu)
@@ -71,8 +66,7 @@ real paretocounts_lpdf(real Y, real mu, real vreal1, real vreal2, real vreal3){
 "
 stanvars <- brms::stanvar(scode = stan_funs, block = "functions")
 
-#' @export
-paretocounts <- function(){brms::custom_family(
+paretocounts <- function(){custom_family(
   "paretocounts",
   dpars = c("mu"),
   links = c("identity"),

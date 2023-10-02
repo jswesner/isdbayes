@@ -1,4 +1,4 @@
-library(dplyr)
+
 
 # make data for isd plot with x = body sizes and y = prob X>=x or num X>=x
 get_isd_data = function(data = NULL, resp = Y){

@@ -1,8 +1,6 @@
 # Calculates the probability X>=x given values of lambda from the posterior (i.e., .epred). Allows for plotting the
 # posterior of the isd
 
-library(tidyverse)
-
 get_isd_posts = function(data = NULL,
                          length = 300,
                          lambda = .epred){
