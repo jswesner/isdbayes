@@ -76,12 +76,19 @@ paretocounts <- function(){custom_family(
   vars = c("vreal1[n]",
            "vreal2[n]",
            "vreal3[n]")
-  # posterior_predict = posterior_predict_paretocounts,
-  # posterior_epred = posterior_epred_paretocounts,
-  # log_lik = log_lik_paretocounts
 )
 }
 
+paretocounts_lpdf_temp = function(Y, mu, vreal1, vreal2, vreal3){
+  if(mu != -1){
+    return(vreal1*(log((mu+1) / ( vreal3^(mu+1) - vreal2^(mu+1))) + mu*log(Y)));
+  }
+  if(mu == -1){
+    return(vreal1*(log(log(vreal2) - log(vreal3)) + mu*log(Y)));
+  }
+}
+
+paretocounts_lpdf = Vectorize(paretocounts_lpdf_temp)
 
 
 

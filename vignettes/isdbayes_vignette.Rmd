@@ -15,12 +15,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-# library(isdbayes)
 library(isdbayes)
 library(here)
-# source(here("R/paretocounts.R"))
-# source(here("R/get_isd_data.R"))
-# source(here("R/get_isd_posts.R"))
 library(brms)
 library(tidyverse)
 ```
@@ -123,7 +119,7 @@ WAIC(fit3)
 
 
 # plot the isd
-Lambda represents the rate of decline in relative abundance as body size increases, but because it doesn't have units like hour, second, height, etc., it is somewhat abstract. It can be easier to see the variation by plotting the probability that a body size X is greater than or equal to another body size x. This code produces the posterior distribution of these so-called "isd plots."
+Lambda represents the rate of decline in relative abundance as body size increases, but because it doesn't have units like hour, height, etc., it is somewhat abstract. It can be easier to see the variation by plotting the probability that a body size X is greater than or equal to another body size x. This code produces the posterior distribution of these so-called "isd plots."
 
 ```{r}
 # get posterior predictions using add_epred_draws
