@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>isdbayes_vignette</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">isdbayes_vignette</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(isdbayes)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">#&gt; here() starts at C:/Users/Jeff.Wesner/OneDrive - The University of South Dakota/USD/Github Projects/isdbayes</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt; Loading required package: Rcpp</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; Loading &#39;brms&#39; package (version 2.19.0). Useful instructions</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt; can be found by typing help(&#39;brms&#39;). A more detailed introduction</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; to the package is available through vignette(&#39;brms_overview&#39;).</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;brms&#39;</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:stats&#39;:</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt;     ar</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; ✔ dplyr     1.1.2     ✔ readr     2.1.4</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; ✔ forcats   1.0.0     ✔ stringr   1.5.0</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt; ✔ ggplot2   3.4.2     ✔ tibble    3.2.1</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt; ✔ lubridate 1.9.2     ✔ tidyr     1.3.0</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt; ✔ purrr     1.0.1</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt; ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="co">#&gt; ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</span></span></code></pre></div>
+<div id="simulate-a-single-size-distribution" class="section level1">
+<h1>simulate a single size distribution</h1>
+<p>This simulates data with rparetocounts(), which takes values of n,
+mu, vreal2, and vreal3. n is the number of body sizes to simulate, mu is
+lambda, vreal2 is xmin, and vreal3 is xmax. The use of “mu” and “vreal2”
+and “vreal3” is required by brms to represent the quantities of
+interest, so those terms are used in this package (which can be
+confusing).</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>isd_data <span class="ot">=</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">rparetocounts</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">xmin =</span> <span class="fu">min</span>(x), <span class="co"># xmin</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>         <span class="at">xmax =</span> <span class="fu">max</span>(x)) <span class="sc">%&gt;%</span> <span class="co">#xmax</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="fu">group_by</span>(x) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="fu">add_tally</span>(<span class="at">name =</span> <span class="st">&quot;counts&quot;</span>) <span class="co"># get counts of each body size. If all sizes are unique, this is just 1. This is where size densities would also go</span></span></code></pre></div>
+</div>
+<div id="estimate-lambda" class="section level1">
+<h1>estimate lambda</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fit1 <span class="ot">=</span> <span class="fu">brm</span>(x <span class="sc">|</span> <span class="fu">vreal</span>(counts, xmin, xmax) <span class="sc">~</span> <span class="dv">1</span>, </span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>          <span class="at">data =</span> isd_data,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>          <span class="at">stanvars =</span> stanvars,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>          <span class="at">family =</span> <span class="fu">paretocounts</span>(),</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>          <span class="at">chains =</span> <span class="dv">1</span>, <span class="at">iter =</span> <span class="dv">1000</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; Compiling Stan program...</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; Start sampling</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; SAMPLING FOR MODEL &#39;anon_model&#39; NOW (CHAIN 1).</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; Chain 1: Gradient evaluation took 0.000323 seconds</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 3.23 seconds.</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; Chain 1: Adjust your expectations accordingly!</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; Chain 1:  Elapsed Time: 0.593 seconds (Warm-up)</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; Chain 1:                0.475 seconds (Sampling)</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt; Chain 1:                1.068 seconds (Total)</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt; Chain 1:</span></span></code></pre></div>
+</div>
+<div id="simulate-multiple-size-distributions" class="section level1">
+<h1>simulate multiple size distributions</h1>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>x1 <span class="ot">=</span> <span class="fu">rparetocounts</span>(<span class="at">mu =</span> <span class="sc">-</span><span class="fl">1.8</span>) <span class="co"># `mu` is required wording from brms. in this case it means the lambda exponent of the ISD</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>x2 <span class="ot">=</span> <span class="fu">rparetocounts</span>(<span class="at">mu =</span> <span class="sc">-</span><span class="fl">1.5</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>x3 <span class="ot">=</span> <span class="fu">rparetocounts</span>(<span class="at">mu =</span> <span class="sc">-</span><span class="fl">1.2</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>isd_data <span class="ot">=</span> <span class="fu">tibble</span>(<span class="at">x1 =</span> x1,</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>                  <span class="at">x2 =</span> x2,</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>                  <span class="at">x3 =</span> x3) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">&quot;group&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;x&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  <span class="fu">group_by</span>(group) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">xmin =</span> <span class="fu">min</span>(x),</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>         <span class="at">xmax =</span> <span class="fu">max</span>(x)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="fu">group_by</span>(group, x) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="fu">add_count</span>(<span class="at">name =</span> <span class="st">&quot;counts&quot;</span>)</span></code></pre></div>
+</div>
+<div id="fit-multiple-size-distributions-with-a-fixed-factor" class="section level1">
+<h1>fit multiple size distributions with a fixed factor</h1>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>fit2 <span class="ot">=</span> <span class="fu">brm</span>(x <span class="sc">|</span> <span class="fu">vreal</span>(counts, xmin, xmax) <span class="sc">~</span> group, </span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>           <span class="at">data =</span> isd_data,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>           <span class="at">stanvars =</span> stanvars,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>           <span class="at">family =</span> <span class="fu">paretocounts</span>(),</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>           <span class="at">chains =</span> <span class="dv">1</span>, <span class="at">iter =</span> <span class="dv">1000</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; Compiling Stan program...</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; Start sampling</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; SAMPLING FOR MODEL &#39;anon_model&#39; NOW (CHAIN 1).</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; Chain 1: Gradient evaluation took 0.00103 seconds</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 10.3 seconds.</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; Chain 1: Adjust your expectations accordingly!</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; Chain 1:  Elapsed Time: 3.159 seconds (Warm-up)</span></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; Chain 1:                2.623 seconds (Sampling)</span></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co">#&gt; Chain 1:                5.782 seconds (Total)</span></span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="co">#&gt; Chain 1:</span></span></code></pre></div>
+</div>
+<div id="plot-group-posteriors" class="section level1">
+<h1>plot group posteriors</h1>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>posts_group <span class="ot">=</span> fit2<span class="sc">$</span>data <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">distinct</span>(group, xmin, xmax) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">counts =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">add_epred_draws</span>(fit2, <span class="at">re_formula =</span> <span class="cn">NA</span>) </span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>posts_group <span class="sc">%&gt;%</span> </span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> group, <span class="at">y =</span> .epred)) <span class="sc">+</span> </span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">stat_halfeye</span>(<span class="at">scale =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.8</span>, <span class="sc">-</span><span class="fl">1.5</span>, <span class="sc">-</span><span class="fl">1.2</span>)) <span class="co"># known lambdas</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="fit-multiple-size-distributions-with-a-varying-intercept" class="section level1">
+<h1>fit multiple size distributions with a varying intercept</h1>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>fit3 <span class="ot">=</span> <span class="fu">brm</span>(x <span class="sc">|</span> <span class="fu">vreal</span>(counts, xmin, xmax) <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>group), </span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>           <span class="at">data =</span> isd_data,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>           <span class="at">stanvars =</span> stanvars,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>           <span class="at">family =</span> <span class="fu">paretocounts</span>(),</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>           <span class="at">chains =</span> <span class="dv">1</span>, <span class="at">iter =</span> <span class="dv">1000</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; Compiling Stan program...</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; Start sampling</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; SAMPLING FOR MODEL &#39;anon_model&#39; NOW (CHAIN 1).</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; Chain 1: Gradient evaluation took 0.000956 seconds</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 9.56 seconds.</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; Chain 1: Adjust your expectations accordingly!</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt; Chain 1: </span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; Chain 1:  Elapsed Time: 24.429 seconds (Warm-up)</span></span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt; Chain 1:                19.092 seconds (Sampling)</span></span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a><span class="co">#&gt; Chain 1:                43.521 seconds (Total)</span></span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a><span class="co">#&gt; Chain 1:</span></span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="co">#&gt; Warning: There were 4 divergent transitions after warmup. See</span></span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a><span class="co">#&gt; https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</span></span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co">#&gt; to find out why this is a problem and how to eliminate them.</span></span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co">#&gt; Warning: Examine the pairs() plot to diagnose sampling problems</span></span>
+<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co">#&gt; Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.</span></span>
+<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a><span class="co">#&gt; Running the chains for more iterations may help. See</span></span>
+<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a><span class="co">#&gt; https://mc-stan.org/misc/warnings.html#bulk-ess</span></span>
+<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a><span class="co">#&gt; Warning: Tail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.</span></span>
+<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a><span class="co">#&gt; Running the chains for more iterations may help. See</span></span>
+<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a><span class="co">#&gt; https://mc-stan.org/misc/warnings.html#tail-ess</span></span></code></pre></div>
+</div>
+<div id="plot-varying-intercepts" class="section level1">
+<h1>plot varying intercepts</h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>posts_varint <span class="ot">=</span> fit3<span class="sc">$</span>data <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="fu">distinct</span>(group, xmin, xmax) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">counts =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">add_epred_draws</span>(fit3, <span class="at">re_formula =</span> <span class="cn">NULL</span>) </span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>posts_varint <span class="sc">%&gt;%</span> </span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> group, <span class="at">y =</span> .epred)) <span class="sc">+</span> </span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">stat_halfeye</span>(<span class="at">scale =</span> <span class="fl">0.2</span>) <span class="sc">+</span> </span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.8</span>, <span class="sc">-</span><span class="fl">1.5</span>, <span class="sc">-</span><span class="fl">1.2</span>)) <span class="co"># known lambdas</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="posterior-predictive-checks" class="section level1">
+<h1>Posterior predictive checks</h1>
+<p>After the model is fit, you can use built-in functions in brms to
+perform model checking.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">pp_check</span>(fit2, <span class="at">type =</span> <span class="st">&quot;dens_overlay_grouped&quot;</span>, <span class="at">group =</span> <span class="st">&quot;group&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt; Using 10 posterior draws for ppc type &#39;dens_overlay_grouped&#39; by default.</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="model-comparison" class="section level1">
+<h1>Model Comparison</h1>
+<p>(This needs to be verified) You can also perform model selection:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">WAIC</span>(fit2)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; Computed from 500 by 900 log-likelihood matrix</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt;           Estimate    SE</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; elpd_waic  -3043.7  72.3</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; p_waic         3.0   0.2</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; waic        6087.4 144.5</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="fu">WAIC</span>(fit3)</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; Computed from 500 by 900 log-likelihood matrix</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt;           Estimate    SE</span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co">#&gt; elpd_waic  -3043.7  72.2</span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="co">#&gt; p_waic         3.0   0.2</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a><span class="co">#&gt; waic        6087.3 144.5</span></span></code></pre></div>
+</div>
+<div id="plot-the-isd" class="section level1">
+<h1>plot the isd</h1>
+<p>Lambda represents the rate of decline in relative abundance as body
+size increases, but because it doesn’t have units like hour, height,
+etc., it is somewhat abstract. It can be easier to see the variation by
+plotting the probability that a body size X is greater than or equal to
+another body size x. This code produces the posterior distribution of
+these so-called “isd plots.”</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># get posterior predictions using add_epred_draws</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>fit2_posts <span class="ot">=</span> fit2<span class="sc">$</span>data <span class="sc">%&gt;%</span> </span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="fu">distinct</span>(group) <span class="sc">%&gt;%</span> <span class="co"># optional groups</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">counts =</span> <span class="dv">1</span>, <span class="co"># placeholder</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>         <span class="at">xmin =</span> <span class="dv">1</span>, <span class="co"># placeholder</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>         <span class="at">xmax =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span> <span class="co"># placeholder</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">add_epred_draws</span>(fit2)</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co"># get posterior of prob X&gt;=x</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>prob_yx_posts <span class="ot">=</span> <span class="fu">get_isd_posts</span>(fit2_posts)</span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co"># plot</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>prob_yx_posts <span class="sc">%&gt;%</span> </span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x.PLB, <span class="at">y =</span> prob_yx)) <span class="sc">+</span></span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="fu">interaction</span>(group, .draw))) <span class="sc">+</span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="sc">~</span>group) <span class="sc">+</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()</span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a><span class="co">#&gt; Warning: Transformation introduced infinite values in continuous y-axis</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="add-data-to-isd-plot" class="section level1">
+<h1>add data to isd plot</h1>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># get prob X&gt;=x or Num X&gt;=x from data</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>isd_data <span class="ot">=</span> fit2<span class="sc">$</span>data <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="fu">group_by</span>(group) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="fu">get_isd_data</span>(<span class="at">resp =</span> x)</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co"># plot</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>prob_yx_posts <span class="sc">%&gt;%</span> </span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x.PLB, <span class="at">y =</span> prob_yx)) <span class="sc">+</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="fu">interaction</span>(group, .draw))) <span class="sc">+</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="sc">~</span>group) <span class="sc">+</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> isd_data, <span class="fu">aes</span>(<span class="at">x =</span> x), <span class="at">color =</span> <span class="st">&quot;yellow&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>)</span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; Warning: Transformation introduced infinite values in continuous y-axis</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; Transformation introduced infinite values in continuous y-axis</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -69,7 +69,7 @@ Next estimate the power law exponent using `brms`.
 ``` r
 library(brms)
 
-m1 = brm(x | vreal(counts, xmin, xmax) ~ 1, 
+fit1 = brm(x | vreal(counts, xmin, xmax) ~ 1, 
           data = dat,
           stanvars = stanvars,    # required for truncated Pareto
           family = paretocounts(),# required for truncated Pareto
@@ -78,8 +78,156 @@ m1 = brm(x | vreal(counts, xmin, xmax) ~ 1,
 
 This example fits an intercept-only model to estimate the power-law
 exponent. For more complex examples with fixed and hierarchical
-predictors, [see the
-vignette](https://github.com/jswesner/isdbayes/blob/master/vignettes/isdbayes_vignette.Rmd).
+predictors, see below.
+
+# simulate multiple size distributions
+
+``` r
+library(isdbayes)
+library(tidyverse)
+```
+
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.2     ✔ readr     2.1.4
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+    ## ✔ ggplot2   3.4.2     ✔ tibble    3.2.1
+    ## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+    ## ✔ purrr     1.0.1     
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
+library(brms)
+```
+
+    ## Loading required package: Rcpp
+    ## Loading 'brms' package (version 2.19.0). Useful instructions
+    ## can be found by typing help('brms'). A more detailed introduction
+    ## to the package is available through vignette('brms_overview').
+    ## 
+    ## Attaching package: 'brms'
+    ## 
+    ## The following object is masked from 'package:stats':
+    ## 
+    ##     ar
+
+``` r
+x1 = rparetocounts(mu = -1.8) # `mu` is required wording from brms. in this case it means the lambda exponent of the ISD
+x2 = rparetocounts(mu = -1.5)
+x3 = rparetocounts(mu = -1.2)
+
+isd_data = tibble(x1 = x1,
+                  x2 = x2,
+                  x3 = x3) %>% 
+  pivot_longer(cols = everything(), names_to = "group", values_to = "x") %>% 
+  group_by(group) %>% 
+  mutate(xmin = min(x),
+         xmax = max(x)) %>% 
+  group_by(group, x) %>% 
+  add_count(name = "counts")
+```
+
+# fit multiple size distributions with a fixed factor
+
+``` r
+fit2 = brm(x | vreal(counts, xmin, xmax) ~ group, 
+           data = isd_data,
+           stanvars = stanvars,
+           family = paretocounts(),
+           chains = 1, iter = 1000)
+```
+
+    ## Compiling Stan program...
+
+    ## Start sampling
+
+# plot group posteriors
+
+``` r
+posts_group = fit2$data %>% 
+  distinct(group, xmin, xmax) %>% 
+  mutate(counts = 1) %>% 
+  tidybayes::add_epred_draws(fit2, re_formula = NA) 
+
+posts_group %>% 
+  ggplot(aes(x = group, y = .epred)) + 
+  tidybayes::stat_halfeye(scale = 0.2) + 
+  geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
+```
+
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+# fit multiple size distributions with a varying intercept
+
+``` r
+fit3 = brm(x | vreal(counts, xmin, xmax) ~ (1|group), 
+           data = isd_data,
+           stanvars = stanvars,
+           family = paretocounts(),
+           chains = 1, iter = 1000)
+```
+
+    ## Compiling Stan program...
+
+    ## Start sampling
+
+    ## Warning: There were 2 divergent transitions after warmup. See
+    ## https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+    ## to find out why this is a problem and how to eliminate them.
+
+    ## Warning: Examine the pairs() plot to diagnose sampling problems
+
+    ## Warning: The largest R-hat is 1.05, indicating chains have not mixed.
+    ## Running the chains for more iterations may help. See
+    ## https://mc-stan.org/misc/warnings.html#r-hat
+
+    ## Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+    ## Running the chains for more iterations may help. See
+    ## https://mc-stan.org/misc/warnings.html#bulk-ess
+
+    ## Warning: Tail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+    ## Running the chains for more iterations may help. See
+    ## https://mc-stan.org/misc/warnings.html#tail-ess
+
+# plot varying intercepts
+
+``` r
+posts_varint = fit3$data %>% 
+  distinct(group, xmin, xmax) %>% 
+  mutate(counts = 1) %>% 
+  tidybayes::add_epred_draws(fit3, re_formula = NULL) 
+
+posts_varint %>% 
+  ggplot(aes(x = group, y = .epred)) + 
+  tidybayes::stat_halfeye(scale = 0.2) + 
+  geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
+```
+
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+# Posterior predictive checks
+
+After the model is fit, you can use built-in functions in brms to
+perform model checking.
+
+``` r
+pp_check(fit2, type = "dens_overlay_grouped", group = "group")
+```
+
+    ## Using 10 posterior draws for ppc type 'dens_overlay_grouped' by default.
+
+![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+# Model Comparison
+
+(This needs to be verified) You can also perform model selection:
+
+``` r
+WAIC(fit2)
+WAIC(fit3)
+```
 
 ## References
 

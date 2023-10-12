@@ -18,11 +18,11 @@ This package allows the estimation of power law exponents using the truncated (u
 
 This package requires installation of `brms` and `rstan`, which itself requires installation of a C++ toolchain.
 
-1) Go to <https://mc-stan.org/users/interfaces/rstan.html> and follow the instructions to install `rstan` and configure the C++ toolchain.
+1)  Go to <https://mc-stan.org/users/interfaces/rstan.html> and follow the instructions to install `rstan` and configure the C++ toolchain.
 
-2) Install the latest version of `brms` with install.packages("brms").
+2)  Install the latest version of `brms` with install.packages("brms").
 
-3) Install `isdbayes` from github using `devtools`:
+3)  Install `isdbayes` from github using `devtools`:
 
 ```{r, eval = F}
 # requires an installation of devtools
@@ -53,7 +53,7 @@ Next estimate the power law exponent using `brms`.
 ```{r, eval = F}
 library(brms)
 
-m1 = brm(x | vreal(counts, xmin, xmax) ~ 1, 
+fit1 = brm(x | vreal(counts, xmin, xmax) ~ 1, 
           data = dat,
           stanvars = stanvars,    # required for truncated Pareto
           family = paretocounts(),# required for truncated Pareto
@@ -61,7 +61,87 @@ m1 = brm(x | vreal(counts, xmin, xmax) ~ 1,
 
 ```
 
-This example fits an intercept-only model to estimate the power-law exponent. For more complex examples with fixed and hierarchical predictors, [see the vignette](https://github.com/jswesner/isdbayes/blob/master/vignettes/isdbayes_vignette.Rmd).
+This example fits an intercept-only model to estimate the power-law exponent. For more complex examples with fixed and hierarchical predictors, see below.
+
+
+# simulate multiple size distributions
+```{r}
+library(isdbayes)
+library(tidyverse)
+library(brms)
+
+x1 = rparetocounts(mu = -1.8) # `mu` is required wording from brms. in this case it means the lambda exponent of the ISD
+x2 = rparetocounts(mu = -1.5)
+x3 = rparetocounts(mu = -1.2)
+
+isd_data = tibble(x1 = x1,
+                  x2 = x2,
+                  x3 = x3) %>% 
+  pivot_longer(cols = everything(), names_to = "group", values_to = "x") %>% 
+  group_by(group) %>% 
+  mutate(xmin = min(x),
+         xmax = max(x)) %>% 
+  group_by(group, x) %>% 
+  add_count(name = "counts")
+```
+
+# fit multiple size distributions with a fixed factor
+```{r}
+fit2 = brm(x | vreal(counts, xmin, xmax) ~ group, 
+           data = isd_data,
+           stanvars = stanvars,
+           family = paretocounts(),
+           chains = 1, iter = 1000)
+```
+
+# plot group posteriors
+```{r}
+posts_group = fit2$data %>% 
+  distinct(group, xmin, xmax) %>% 
+  mutate(counts = 1) %>% 
+  tidybayes::add_epred_draws(fit2, re_formula = NA) 
+
+posts_group %>% 
+  ggplot(aes(x = group, y = .epred)) + 
+  tidybayes::stat_halfeye(scale = 0.2) + 
+  geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
+```
+
+# fit multiple size distributions with a varying intercept
+```{r}
+fit3 = brm(x | vreal(counts, xmin, xmax) ~ (1|group), 
+           data = isd_data,
+           stanvars = stanvars,
+           family = paretocounts(),
+           chains = 1, iter = 1000)
+```
+# plot varying intercepts
+```{r}
+posts_varint = fit3$data %>% 
+  distinct(group, xmin, xmax) %>% 
+  mutate(counts = 1) %>% 
+  tidybayes::add_epred_draws(fit3, re_formula = NULL) 
+
+posts_varint %>% 
+  ggplot(aes(x = group, y = .epred)) + 
+  tidybayes::stat_halfeye(scale = 0.2) + 
+  geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
+```
+
+
+# Posterior predictive checks
+After the model is fit, you can use built-in functions in brms to perform model checking.
+```{r}
+pp_check(fit2, type = "dens_overlay_grouped", group = "group")
+```
+
+# Model Comparison
+(This needs to be verified) You can also perform model selection:
+```{r}
+WAIC(fit2)
+WAIC(fit3)
+
+```
 
 ## References
 
