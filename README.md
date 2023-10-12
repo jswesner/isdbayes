@@ -33,7 +33,9 @@ requires installation of a C++ toolchain.
 devtools::install_github("jswesner/isdbayes")
 ```
 
-## Example
+# Examples
+
+## Fit individual samples
 
 `isdbayes` amends the stanvars and family options in brms models to
 accept the truncated Pareto. First, simulate some power law data using
@@ -80,40 +82,13 @@ This example fits an intercept-only model to estimate the power-law
 exponent. For more complex examples with fixed and hierarchical
 predictors, see below.
 
-# simulate multiple size distributions
+# Simulate multiple size distributions
 
 ``` r
 library(isdbayes)
 library(tidyverse)
-```
-
-    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ dplyr     1.1.2     ✔ readr     2.1.4
-    ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
-    ## ✔ ggplot2   3.4.2     ✔ tibble    3.2.1
-    ## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
-    ## ✔ purrr     1.0.1     
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::filter() masks stats::filter()
-    ## ✖ dplyr::lag()    masks stats::lag()
-    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
 library(brms)
-```
 
-    ## Loading required package: Rcpp
-    ## Loading 'brms' package (version 2.19.0). Useful instructions
-    ## can be found by typing help('brms'). A more detailed introduction
-    ## to the package is available through vignette('brms_overview').
-    ## 
-    ## Attaching package: 'brms'
-    ## 
-    ## The following object is masked from 'package:stats':
-    ## 
-    ##     ar
-
-``` r
 x1 = rparetocounts(mu = -1.8) # `mu` is required wording from brms. in this case it means the lambda exponent of the ISD
 x2 = rparetocounts(mu = -1.5)
 x3 = rparetocounts(mu = -1.2)
@@ -129,7 +104,7 @@ isd_data = tibble(x1 = x1,
   add_count(name = "counts")
 ```
 
-# fit multiple size distributions with a fixed factor
+# Fit multiple size distributions with a fixed factor
 
 ``` r
 fit2 = brm(x | vreal(counts, xmin, xmax) ~ group, 
@@ -139,11 +114,7 @@ fit2 = brm(x | vreal(counts, xmin, xmax) ~ group,
            chains = 1, iter = 1000)
 ```
 
-    ## Compiling Stan program...
-
-    ## Start sampling
-
-# plot group posteriors
+# Plot group posteriors
 
 ``` r
 posts_group = fit2$data %>% 
@@ -157,9 +128,9 @@ posts_group %>%
   geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
-# fit multiple size distributions with a varying intercept
+# Fit multiple size distributions with a varying intercept
 
 ``` r
 fit3 = brm(x | vreal(counts, xmin, xmax) ~ (1|group), 
@@ -169,29 +140,7 @@ fit3 = brm(x | vreal(counts, xmin, xmax) ~ (1|group),
            chains = 1, iter = 1000)
 ```
 
-    ## Compiling Stan program...
-
-    ## Start sampling
-
-    ## Warning: There were 2 divergent transitions after warmup. See
-    ## https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
-    ## to find out why this is a problem and how to eliminate them.
-
-    ## Warning: Examine the pairs() plot to diagnose sampling problems
-
-    ## Warning: The largest R-hat is 1.05, indicating chains have not mixed.
-    ## Running the chains for more iterations may help. See
-    ## https://mc-stan.org/misc/warnings.html#r-hat
-
-    ## Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
-    ## Running the chains for more iterations may help. See
-    ## https://mc-stan.org/misc/warnings.html#bulk-ess
-
-    ## Warning: Tail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
-    ## Running the chains for more iterations may help. See
-    ## https://mc-stan.org/misc/warnings.html#tail-ess
-
-# plot varying intercepts
+# Plot varying intercepts
 
 ``` r
 posts_varint = fit3$data %>% 
@@ -205,7 +154,7 @@ posts_varint %>%
   geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 # Posterior predictive checks
 
@@ -214,20 +163,10 @@ perform model checking.
 
 ``` r
 pp_check(fit2, type = "dens_overlay_grouped", group = "group")
+#> Using 10 posterior draws for ppc type 'dens_overlay_grouped' by default.
 ```
 
-    ## Using 10 posterior draws for ppc type 'dens_overlay_grouped' by default.
-
-![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
-
-# Model Comparison
-
-(This needs to be verified) You can also perform model selection:
-
-``` r
-WAIC(fit2)
-WAIC(fit3)
-```
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ## References
 

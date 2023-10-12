@@ -6,8 +6,11 @@ output: github_document
 bibliography: refs.bib
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, results = 'hide')
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 ```
 
 ## Overview
@@ -31,8 +34,8 @@ devtools::install_github("jswesner/isdbayes")
 
 ```
 
-## Example
-
+# Examples
+## Fit individual samples
 `isdbayes` amends the stanvars and family options in brms models to accept the truncated Pareto. First, simulate some power law data using the `rparetocounts()` function. The code below simulates 300 body sizes from a power law with exponent (mu) = -1.2, xmin (vreal2) = 1, and xmax (vreal3) = 1000. The options are called "mu", "vreal2", and "vreal3" instead of "lambda", "xmin", and "xmax" to fit with the generic naming requirements of `brms` for custom family distributions.
 
 ```{r, eval = F}
@@ -50,6 +53,13 @@ The code above simulates data from a doubly-truncated Pareto and then estimates 
 
 Next estimate the power law exponent using `brms`.
 
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+fit1 = readRDS(here::here("models/fit1.rds"))
+fit2 = readRDS(here::here("models/fit2.rds"))
+fit3 = readRDS(here::here("models/fit3.rds"))
+```
+
+
 ```{r, eval = F}
 library(brms)
 
@@ -64,8 +74,8 @@ fit1 = brm(x | vreal(counts, xmin, xmax) ~ 1,
 This example fits an intercept-only model to estimate the power-law exponent. For more complex examples with fixed and hierarchical predictors, see below.
 
 
-# simulate multiple size distributions
-```{r}
+# Simulate multiple size distributions
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 library(isdbayes)
 library(tidyverse)
 library(brms)
@@ -85,8 +95,8 @@ isd_data = tibble(x1 = x1,
   add_count(name = "counts")
 ```
 
-# fit multiple size distributions with a fixed factor
-```{r}
+# Fit multiple size distributions with a fixed factor
+```{r, eval = F}
 fit2 = brm(x | vreal(counts, xmin, xmax) ~ group, 
            data = isd_data,
            stanvars = stanvars,
@@ -94,7 +104,7 @@ fit2 = brm(x | vreal(counts, xmin, xmax) ~ group,
            chains = 1, iter = 1000)
 ```
 
-# plot group posteriors
+# Plot group posteriors
 ```{r}
 posts_group = fit2$data %>% 
   distinct(group, xmin, xmax) %>% 
@@ -107,15 +117,15 @@ posts_group %>%
   geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
 ```
 
-# fit multiple size distributions with a varying intercept
-```{r}
+# Fit multiple size distributions with a varying intercept
+```{r, eval = F}
 fit3 = brm(x | vreal(counts, xmin, xmax) ~ (1|group), 
            data = isd_data,
            stanvars = stanvars,
            family = paretocounts(),
            chains = 1, iter = 1000)
 ```
-# plot varying intercepts
+# Plot varying intercepts
 ```{r}
 posts_varint = fit3$data %>% 
   distinct(group, xmin, xmax) %>% 
@@ -135,13 +145,6 @@ After the model is fit, you can use built-in functions in brms to perform model 
 pp_check(fit2, type = "dens_overlay_grouped", group = "group")
 ```
 
-# Model Comparison
-(This needs to be verified) You can also perform model selection:
-```{r}
-WAIC(fit2)
-WAIC(fit3)
-
-```
 
 ## References
 
