@@ -6,14 +6,14 @@ Jeff Wesner
 ## Overview
 
 This package allows the estimation of power law exponents using the
-truncated (upper and lower) Pareto distribution. Specifically, it allows
-users to fit Bayesian (non)-linear hierarchical models with a truncated
-Pareto likelihood using `brms` (Bürkner 2017). The motivation for the
-package was to estimate power law exponents of ecological size spectra
-using individual-level body size data in a generalized mixed model
-framework. The likelihood for the truncated Pareto used here was
-described in (Edwards et al. 2020). This package translates that
-likelihood into `brms`.
+truncated (upper and lower) Pareto distribution (Wesner et al. 2023).
+Specifically, it allows users to fit Bayesian (non)-linear hierarchical
+models with a truncated Pareto likelihood using `brms` (Bürkner 2017).
+The motivation for the package was to estimate power law exponents of
+ecological size spectra using individual-level body size data in a
+generalized mixed model framework. The likelihood for the truncated
+Pareto used here was described in (Edwards et al. 2020). This package
+translates that likelihood into `brms`.
 
 ## Installation
 
@@ -186,6 +186,14 @@ Edwards, Am, Jpw Robinson, Jl Blanchard, Jk Baum, and Mj Plank. 2020.
 “Accounting for the Bin Structure of Data Removes Bias When Fitting Size
 Spectra.” *Marine Ecology Progress Series* 636 (February): 19–33.
 <https://doi.org/10.3354/meps13230>.
+
+</div>
+
+<div id="ref-wesner2023bayesian" class="csl-entry">
+
+Wesner, Jeff S, Justin PF Pomeranz, James R Junker, and Vojsava Gjoni.
+2023. “Bayesian Hierarchical Modeling of Size Spectra.” *bioRxiv*,
+2023–02.
 
 </div>
 
