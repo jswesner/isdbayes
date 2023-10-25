@@ -2,8 +2,8 @@ Package: isdbayes
 Type: Package
 Title: Bayesian Hierarchical Modeling of Power Laws using brms
 Version: 0.1.0
-Authors@R: person("Jeff", "Wesner", email = "jeff.wesner@usd.edu",
-  role = c("aut", "cre"))
+Authors@R: c(person("Jeff", "Wesner", email = "jeff.wesner@usd.edu", role = "cre"),
+            (person("Justin", "Pomeranz", email = "jfpomeranz@gmail.com", role = "aut")))
 Description: Estimates the exponent of a power law from one or more samples using Generalized (non)-linear mixed models in brms.
     The package adds a doubly-truncated Pareto family to brms. It will also simulate data from the doubly-truncated Pareto and
     and generate plots of posterior fits to data. Most other built-in features of brms, such as conditional_effects() and posterior
