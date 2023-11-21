@@ -1,7 +1,6 @@
 isdbayes: Bayesian hierarchical modeling of size spectra
 ================
 Jeff Wesner
-2023-10-04
 
 ## Overview
 
@@ -12,7 +11,7 @@ models with a truncated Pareto likelihood using `brms` (Bürkner 2017).
 The motivation for the package was to estimate power law exponents of
 ecological size spectra using individual-level body size data in a
 generalized mixed model framework. The likelihood for the truncated
-Pareto used here was described in (A. Edwards et al. 2020). This package
+Pareto used here was described in (Edwards et al. 2020). This package
 translates that likelihood into `brms`.
 
 ## Installation
@@ -168,84 +167,7 @@ pp_check(fit2, type = "dens_overlay_grouped", group = "group")
 
 ![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
-# Plotting the ISD
-
-To plot the posterior against data, use plot_isd_posts() and then add
-data with get_isd_data(). These plots follow the format of A. M. Edwards
-et al. (2017), with body size values on the x-axis and the number of
-values $\geq$ x (“n_yx”) on the y-axis.
-
-``` r
-# wrangle isd data for plotting
-isd_dat = make_isd_data(fit2, group = group)
-
-# plot posterior ISD with data overlaid
-plot_isd_posts(fit2, group = group) + 
-  geom_point(data = isd_dat)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
-
-In the plot above, the posteriors are summarized with a median and 95%
-Credible Interval. To access the underling posteriors, use
-get_isd_posts()
-
-``` r
-# get ISD posteriors
-isd_posts = get_isd_posts(fit2, group = group)
-
-head(isd_posts)
-#> # A tibble: 6 × 13
-#> # Groups:   group, n [1]
-#>   group     n     x  xmin  xmax counts  .row .chain .iteration .draw .epred
-#>   <chr> <int> <dbl> <dbl> <dbl>  <dbl> <int>  <int>      <int> <int>  <dbl>
-#> 1 x1      300  1.00  1.00  363.      1     1     NA         NA     1  -1.71
-#> 2 x1      300  1.00  1.00  363.      1     1     NA         NA     2  -1.66
-#> 3 x1      300  1.00  1.00  363.      1     1     NA         NA     3  -1.82
-#> 4 x1      300  1.00  1.00  363.      1     1     NA         NA     4  -1.76
-#> 5 x1      300  1.00  1.00  363.      1     1     NA         NA     5  -1.67
-#> 6 x1      300  1.00  1.00  363.      1     1     NA         NA     6  -1.65
-#> # ℹ 2 more variables: prob_yx <dbl>, n_yx <dbl>
-```
-
-Now we can plot the posterior draws individually.
-
-``` r
-# get ISD posteriors
-isd_posts %>% 
-  ggplot(aes(x = x, y = n_yx, group = interaction(group, .draw), color = group)) +
-  geom_line()
-```
-
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
-
-Adding log-scales to x
-
-``` r
-# get ISD posteriors
-isd_posts %>% 
-  ggplot(aes(x = x, y = n_yx, group = interaction(group, .draw), color = group)) +
-  geom_line() +
-  scale_x_log10()
-```
-
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
-
-Adding log-scales to x and y requires cutting off at n_yx = 1 to avoid
-plotting errors
-
-``` r
-# get ISD posteriors
-isd_posts %>% 
-  ggplot(aes(x = x, y = n_yx, group = interaction(group, .draw), color = group)) +
-  geom_line() +
-  scale_x_log10() +
-  scale_y_log10() + 
-  coord_cartesian(ylim = c(1, NA)) # this cuts of the y-axis. For the full posterior plot, remove scale_y_log10() the last line
-```
-
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- --> \##
-References
+## References
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 
@@ -263,14 +185,6 @@ Edwards, Am, Jpw Robinson, Jl Blanchard, Jk Baum, and Mj Plank. 2020.
 “Accounting for the Bin Structure of Data Removes Bias When Fitting Size
 Spectra.” *Marine Ecology Progress Series* 636 (February): 19–33.
 <https://doi.org/10.3354/meps13230>.
-
-</div>
-
-<div id="ref-edwards2017testing" class="csl-entry">
-
-Edwards, Andrew M, James PW Robinson, Michael J Plank, Julia K Baum, and
-Julia L Blanchard. 2017. “Testing and Recommending Methods for Fitting
-Size Spectra to Data.” *Methods in Ecology and Evolution* 8 (1): 57–67.
 
 </div>
 

@@ -1,7 +1,6 @@
 ---
 title: 'isdbayes: Bayesian hierarchical modeling of size spectra'
 author: "Jeff Wesner"
-date: "2023-10-04"
 output: github_document
 bibliography: refs.bib
 ---
@@ -152,52 +151,6 @@ After the model is fit, you can use built-in functions in brms to perform model 
 pp_check(fit2, type = "dens_overlay_grouped", group = "group")
 ```
 
-# Plotting the ISD
-To plot the posterior against data, use plot_isd_posts() and then add data with get_isd_data(). These plots follow the format of @edwards2017testing, with body size values on the x-axis and the number of values $\geq$ x ("n_yx") on the y-axis. 
-```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
-# wrangle isd data for plotting
-isd_dat = make_isd_data(fit2, group = group)
-
-# plot posterior ISD with data overlaid
-plot_isd_posts(fit2, group = group) + 
-  geom_point(data = isd_dat)
-```
-
-In the plot above, the posteriors are summarized with a median and 95% Credible Interval. To access the underling posteriors, use get_isd_posts()
-```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
-# get ISD posteriors
-isd_posts = get_isd_posts(fit2, group = group)
-
-head(isd_posts)
-```
-
-Now we can plot the posterior draws individually.
-```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
-# get ISD posteriors
-isd_posts %>% 
-  ggplot(aes(x = x, y = n_yx, group = interaction(group, .draw), color = group)) +
-  geom_line()
-```
-
-Adding log-scales to x
-```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
-# get ISD posteriors
-isd_posts %>% 
-  ggplot(aes(x = x, y = n_yx, group = interaction(group, .draw), color = group)) +
-  geom_line() +
-  scale_x_log10()
-```
-
-Adding log-scales to x and y requires cutting off at n_yx = 1 to avoid plotting errors
-```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
-# get ISD posteriors
-isd_posts %>% 
-  ggplot(aes(x = x, y = n_yx, group = interaction(group, .draw), color = group)) +
-  geom_line() +
-  scale_x_log10() +
-  scale_y_log10() + 
-  coord_cartesian(ylim = c(1, NA)) # this cuts of the y-axis. For the full posterior plot, remove scale_y_log10() the last line
-```
 ## References
 
 ::: {#refs}
