@@ -36,13 +36,12 @@ devtools::install_github("jswesner/isdbayes")
 
 ## Fit individual samples
 
-`isdbayes` amends the stanvars and family options in brms models to
-accept the truncated Pareto. First, simulate some power law data using
-the `rparetocounts()` function. The code below simulates 300 body sizes
-from a power law with exponent (mu) = -1.2, xmin (vreal2) = 1, and xmax
-(vreal3) = 1000. The options are called “mu”, “vreal2”, and “vreal3”
-instead of “lambda”, “xmin”, and “xmax” to fit with the generic naming
-requirements of `brms` for custom family distributions.
+First, simulate some power law data using `rparetocounts()`. The code
+below simulates 300 body sizes from a power law with exponent (mu) =
+-1.2, xmin (vreal2) = 1, and xmax (vreal3) = 1000. The options are
+called “mu”, “vreal2”, and “vreal3” instead of “lambda”, “xmin”, and
+“xmax” to fit with the generic naming requirements of `brms` for custom
+family distributions.
 
 ``` r
 library(isdbayes)
@@ -58,12 +57,12 @@ The code above simulates data from a doubly-truncated Pareto and then
 estimates xmin and xmax. It also adds a column for *counts.* If the data
 all represent unique individual masses, then this column takes a value
 of 1 for every body size. If the data have repeated sizes, then this
-column can take an integer of the counts of those sizes. For example,
-data that are x = {1.9, 1.9, 1.8, 2.8, 2.8} could either be analyzed
-with each body size assumed to be unique where counts = {1, 1, 1, 1, 1}
-or it could be analyzed as x = {1.9, 1.8, 2.8} and counts = {2, 1, 2}.
-The latter is a common format when there is a density estimate
-associated with counts or a sampling effort.
+column can take an integer or double of the counts or densities of those
+sizes. For example, data that are x = {1.9, 1.9, 1.8, 2.8, 2.8} could
+either be analyzed with each body size assumed to be unique where counts
+= {1, 1, 1, 1, 1} or it could be analyzed as x = {1.9, 1.8, 2.8} and
+counts = {2, 1, 2}. The latter is a common format when there is a
+density estimate associated with counts or a sampling effort.
 
 Next estimate the power law exponent using `brms`.
 
@@ -81,7 +80,7 @@ This example fits an intercept-only model to estimate the power-law
 exponent. For more complex examples with fixed and hierarchical
 predictors, see below.
 
-# Simulate multiple size distributions
+## Simulate multiple size distributions
 
 ``` r
 library(isdbayes)
@@ -103,7 +102,7 @@ isd_data = tibble(x1 = x1,
   add_count(name = "counts")
 ```
 
-# Fit multiple size distributions with a fixed factor
+## Fit multiple size distributions with a fixed factor
 
 ``` r
 fit2 = brm(x | vreal(counts, xmin, xmax) ~ group, 
@@ -113,7 +112,7 @@ fit2 = brm(x | vreal(counts, xmin, xmax) ~ group,
            chains = 1, iter = 1000)
 ```
 
-# Plot group posteriors
+## Plot group posteriors
 
 ``` r
 posts_group = fit2$data %>% 
@@ -129,7 +128,7 @@ posts_group %>%
 
 ![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
-# Fit multiple size distributions with a varying intercept
+## Fit multiple size distributions with a varying intercept
 
 ``` r
 fit3 = brm(x | vreal(counts, xmin, xmax) ~ (1|group), 
@@ -139,7 +138,7 @@ fit3 = brm(x | vreal(counts, xmin, xmax) ~ (1|group),
            chains = 1, iter = 1000)
 ```
 
-# Plot varying intercepts
+## Plot varying intercepts
 
 ``` r
 posts_varint = fit3$data %>% 
@@ -155,7 +154,7 @@ posts_varint %>%
 
 ![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
-# Posterior predictive checks
+## Posterior predictive checks
 
 After the model is fit, you can use built-in functions in brms to
 perform model checking.
