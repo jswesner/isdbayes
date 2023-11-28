@@ -4,6 +4,9 @@ utils::globalVariables(c("x", "vreal2", "vreal3"))
 
 
 #' Simulate data from a bounded power law
+#' Simulates data from a bounded power law. This is basically a vectorized version of the rPLB() function
+#' in Edwards et al. (2017) `sizeSpectra` package. The argument names are required to match the default
+#' arguments for custom likelihoods in `brms`.
 #'
 #' @param n number of observations
 #' @param mu vector of lambda (the power law exponent)
