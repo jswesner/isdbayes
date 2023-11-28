@@ -67,6 +67,20 @@ dparetocounts <- function(x, mu, vreal2, vreal3) {
 }
 
 
+#' Generate custom log-likelihood for Stan
+#'
+#' This function is not called directly. It is only used to set up the log likelihood for
+#' later use in `brms` via the family option within `brm()`
+#'
+#'
+#' @param i see documentation from `get_dpar` within `brms`
+#' @param prep see documentation from `get_dpar` within `brms`
+#'
+#' @return NA
+#' @export
+#'
+#' @examples
+#' NA
 log_lik_paretocounts <- function(i, prep) {
   mu <- get_dpar(prep, "mu", i = i)
   vreal1 <- prep$data$vreal1[i]
@@ -76,6 +90,19 @@ log_lik_paretocounts <- function(i, prep) {
   paretocounts_lpdf(Y, mu, vreal1, vreal2, vreal3)
 }
 
+#' Arrange data for posterior prediction
+#'
+#' This function is not called directly.
+#'
+#' @param i see documentation from `get_dpar` within `brms`
+#' @param prep see documentation from `get_dpar` within `brms`
+#' @param ...
+#'
+#' @return NA
+#' @export
+#'
+#' @examples
+#' NA
 posterior_predict_paretocounts <- function(i, prep, ...) {
   mu <- get_dpar(prep, "mu", i = i)
   vreal2 = prep$data$vreal2[i]
@@ -83,6 +110,18 @@ posterior_predict_paretocounts <- function(i, prep, ...) {
   rparetocounts(prep$ndraws, mu, vreal2, vreal3)
 }
 
+#' Arrange data for posterior epred prediction
+#'
+#' This function is not called directly. It is only used to allow add_epred_draws() from the
+#' `tidybayes` package to work with a `brmfit` object with a paretocounts_lpdf.
+#'
+#' @param prep see documentation from `get_dpar` within `brms`
+#'
+#' @return NA
+#' @export
+#'
+#' @examples
+#' NA
 posterior_epred_paretocounts <- function(prep) {
   mu <- prep$dpars$mu
   return(mu)
@@ -98,6 +137,17 @@ real paretocounts_lpdf(real Y, real mu, real vreal1, real vreal2, real vreal3){
 "
 stanvars <- brms::stanvar(scode = stan_funs, block = "functions")
 
+#' Create custom paretocounts family
+#'
+#' This function is not called directly. It is only used to create the paretocounts() family option
+#' in `brms`
+#'
+#'
+#' @return NA
+#' @export
+#'
+#' @examples
+#' NA
 paretocounts <- function(){custom_family(
   "paretocounts",
   dpars = c("mu"),
@@ -111,6 +161,22 @@ paretocounts <- function(){custom_family(
 )
 }
 
+#' Create paretocounts log posterior density function
+#'
+#' This function is not called directly. It is only used to create the paretocounts() family option
+#' in `brms`
+#'
+#' @param Y vector of data (individual body sizes)
+#' @param mu exponent of the bounded power law
+#' @param vreal1 counts for each body size (numeric of integer)
+#' @param vreal2 xmin: the minimum body size of the sample or the minimum possible body size
+#' @param vreal3 xmax: the maximum body size of the sample or the maximum possible body size
+#'
+#' @return temporary function that is later vectorized using vectorize(paretocounts_lpdf_temp)
+#' @export
+#'
+#' @examples
+#' NA
 paretocounts_lpdf_temp = function(Y, mu, vreal1, vreal2, vreal3){
   if(mu != -1){
     return(vreal1*(log((mu+1) / ( vreal3^(mu+1) - vreal2^(mu+1))) + mu*log(Y)));
