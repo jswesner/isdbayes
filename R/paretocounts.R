@@ -34,6 +34,18 @@ rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
 }
 
 
+#' Bounded power law probability density function
+#'
+#' @param x body size value
+#' @param mu vector of lambda (the power law exponent)
+#' @param vreal2 xmin: the minimum body size of the sample or the minimum possible body size
+#' @param vreal3 xmax: the maximum body size of the sample or the maximum possible body size
+#'
+#' @return a numeric vector of the value of the pdf given values of x, mu, xmin, and xmax.
+#' @export
+#'
+#' @examples
+#' dparetocounts(x = 2, mu = -1.5, vreal2 = 1, vreal3 = 1000)
 dparetocounts <- function(x, mu, vreal2, vreal3) {
   if (vreal2 <= 0 || vreal2 >= vreal3)
     stop("Parameters out of bounds in dPLB")
