@@ -2,6 +2,19 @@
 utils::globalVariables(c("x", "vreal2", "vreal3"))
 
 
+
+#' Simulate data from a bounded power law
+#'
+#' @param n number of observations
+#' @param mu vector of lambda (the power law exponent)
+#' @param vreal2 xmin: the minimum body size of the sample or the minimum possible body size
+#' @param vreal3 xmax: the maximum body size of the sample or the maximum possible body size
+#'
+#' @return a numeric vector
+#' @export
+#'
+#' @examples
+#' rparetocounts(n = 100, mu = -1.5, vreal2 = 1, vreal3 = 2000)
 rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
   samples <- numeric(n)
   {
