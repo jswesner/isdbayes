@@ -45,7 +45,11 @@ rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
 #' @export
 #'
 #' @examples
-#' dparetocounts(x = 2, mu = -1.5, vreal2 = 1, vreal3 = 1000)
+#' xmin = 1
+#' xmax = 1000
+#' lambda = -1.5
+#'
+#' dparetocounts(x = 2, mu = lambda, vreal2 = xmin, vreal3 = xmax)
 dparetocounts <- function(x, mu, vreal2, vreal3) {
   if (vreal2 <= 0 || vreal2 >= vreal3)
     stop("Parameters out of bounds in dPLB")
