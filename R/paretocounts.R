@@ -82,7 +82,7 @@ dparetocounts <- function(x, mu, vreal2, vreal3) {
 #' @examples
 #' NA
 log_lik_paretocounts <- function(i, prep) {
-  mu <- get_dpar(prep, "mu", i = i)
+  mu <- brms::get_dpar(prep, "mu", i = i)
   vreal1 <- prep$data$vreal1[i]
   vreal2 <- prep$data$vreal2[i]
   vreal3 <- prep$data$vreal3[i]
@@ -104,7 +104,7 @@ log_lik_paretocounts <- function(i, prep) {
 #' @examples
 #' NA
 posterior_predict_paretocounts <- function(i, prep, ...) {
-  mu <- get_dpar(prep, "mu", i = i)
+  mu <- brms::get_dpar(prep, "mu", i = i)
   vreal2 = prep$data$vreal2[i]
   vreal3 = prep$data$vreal3[i]
   rparetocounts(prep$ndraws, mu, vreal2, vreal3)
