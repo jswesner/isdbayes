@@ -1,7 +1,8 @@
 ---
 title: 'isdbayes: Bayesian hierarchical modeling of size spectra'
 author: "Jeff Wesner"
-output: github_document
+output: 
+  github_document
 bibliography: refs.bib
 ---
 

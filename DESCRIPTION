@@ -8,12 +8,13 @@ Description: Estimates the exponent of a power law from one or more samples usin
     The package adds a doubly-truncated Pareto family to brms. It will also simulate data from the doubly-truncated Pareto and
     and generate plots of posterior fits to data. Most other built-in features of brms, such as conditional_effects() and posterior
     sampoing will also work. 
-License: use_mit_license()
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    tidyverse,
-    brms
+    brms,
+    dplyr,
+    magrittr
 Suggests:
     tidybayes
 RoxygenNote: 7.2.3
