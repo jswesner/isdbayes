@@ -18,15 +18,15 @@ utils::globalVariables(c("x", "vreal2", "vreal3"))
 #'
 #' @examples
 #' rparetocounts(n = 100, mu = -1.5, vreal2 = 1, vreal3 = 2000)
-rparetocounts <- function(n = 300, lambda = -1.2, xmin = 1, xmax = 1000) {
+rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
   samples <- numeric(n)
   {
-    if(xmin <= 0 | xmin >= xmax) stop("Parameters out of bounds in rPLB")
+    if(vreal2 <= 0 | vreal2 >= vreal3) stop("Parameters out of bounds in rPLB")
     u <- stats::runif(n)
-    if(lambda != -1){
-      y <- ( u*xmax^(lambda+1) +  (1-u) * xmin^(lambda+1) ) ^ (1/(lambda+1))
+    if(mu != -1){
+      y <- ( u*vreal3^(mu+1) +  (1-u) * vreal2^(mu+1) ) ^ (1/(mu+1))
     } else
-    { y <- xmax^u * xmin^(1-u)
+    { y <- vreal3^u * vreal2^(1-u)
     }
     return(y)
   }
