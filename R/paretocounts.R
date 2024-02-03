@@ -19,19 +19,25 @@ utils::globalVariables(c("x", "vreal2", "vreal3"))
 #' @examples
 #' rparetocounts(n = 100, mu = -1.5, vreal2 = 1, vreal3 = 2000)
 rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
-  samples <- numeric(n)
-  {
-    if(vreal2 <= 0 | vreal2 >= vreal3) stop("Parameters out of bounds in rPLB")
-    u <- stats::runif(n)
-    if(mu != -1){
-      y <- ( u*vreal3^(mu+1) +  (1-u) * vreal2^(mu+1) ) ^ (1/(mu+1))
-    } else
-    { y <- vreal3^u * vreal2^(1-u)
-    }
-    return(y)
+  samples <- numeric(n)  # Create a numeric vector to store the samples
+
+  # Check if parameters are within bounds for each row
+  if (any(vreal2 <= 0 | vreal2 >= vreal3)) {
+    warning("Parameters out of bounds in rPLB. Returning NA.")
+    return(rep(NA, n))
   }
-  return(samples)
+
+  # Generate n random uniform numbers
+  u <- stats::runif(n)
+
+  # Generate samples based on the Pareto distribution formula
+  ifelse(mu != -1,
+         y <- (u * vreal3^(mu + 1) + (1 - u) * vreal2^(mu + 1))^(1/(mu + 1)),
+         y <- vreal3^u * vreal2^(1 - u))
+
+  return(y)  # Return the generated samples
 }
+
 
 
 #' Bounded power law probability density function
