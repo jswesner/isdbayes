@@ -9,20 +9,20 @@ utils::globalVariables(c("x", "vreal2", "vreal3"))
 #' arguments for custom likelihoods in `brms`.
 #'
 #' @param n number of observations
-#' @param mu vector of lambda (the power law exponent)
-#' @param vreal2 xmin: the minimum body size of the sample or the minimum possible body size
-#' @param vreal3 xmax: the maximum body size of the sample or the maximum possible body size
+#' @param lambda vector of lambda (the power law exponent)
+#' @param xmin xmin: the minimum body size of the sample or the minimum possible body size
+#' @param xmax xmax: the maximum body size of the sample or the maximum possible body size
 #'
 #' @return a numeric vector
 #' @export
 #'
 #' @examples
-#' rparetocounts(n = 100, mu = -1.5, vreal2 = 1, vreal3 = 2000)
-rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
+#' rparetocounts(n = 100, lambda = -1.5, xmin = 1, xmax = 2000)
+rparetocounts <- function(n = 300, lambda = -1.2, xmin = 1, xmax = 1000) {
   samples <- numeric(n)  # Create a numeric vector to store the samples
 
   # Check if parameters are within bounds for each row
-  if (any(vreal2 <= 0 | vreal2 >= vreal3)) {
+  if (any(xmin <= 0 | xmin >= xmax)) {
     warning("Parameters out of bounds in rPLB. Returning NA.")
     return(rep(NA, n))
   }
@@ -30,10 +30,10 @@ rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
   # Generate n random uniform numbers
   u <- stats::runif(n)
 
-  # Generate samples based on the Pareto distribution formula
-  ifelse(mu != -1,
-         y <- (u * vreal3^(mu + 1) + (1 - u) * vreal2^(mu + 1))^(1/(mu + 1)),
-         y <- vreal3^u * vreal2^(1 - u))
+  # Generate samples based on the Pareto distribution formua
+  ifelse(lambda != -1,
+         y <- (u * xmax^(lambda + 1) + (1 - u) * xmin^(lambda + 1))^(1/(lambda + 1)),
+         y <- xmax^u * xmin^(1 - u))
 
   return(y)  # Return the generated samples
 }
@@ -43,11 +43,11 @@ rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
 #' Bounded power law probability density function
 #'
 #' @param x body size value
-#' @param mu vector of lambda (the power law exponent)
-#' @param vreal2 xmin: the minimum body size of the sample or the minimum possible body size
-#' @param vreal3 xmax: the maximum body size of the sample or the maximum possible body size
+#' @param lambda vector of lambda (the power law exponent)
+#' @param xmin xmin: the minimum body size of the sample or the minimum possible body size
+#' @param xmax xmax: the maximum body size of the sample or the maximum possible body size
 #'
-#' @return a numeric vector of the value of the pdf given values of x, mu, xmin, and xmax.
+#' @return a numeric vector of the value of the pdf given values of x, lambda, xmin, and xmax.
 #' @export
 #'
 #' @examples
@@ -55,18 +55,18 @@ rparetocounts <- function(n = 300, mu = -1.2, vreal2 = 1, vreal3 = 1000) {
 #' xmax = 1000
 #' lambda = -1.5
 #'
-#' dparetocounts(x = 2, mu = lambda, vreal2 = xmin, vreal3 = xmax)
-dparetocounts <- function(x, mu, vreal2, vreal3) {
-  if (vreal2 <= 0 || vreal2 >= vreal3)
+#' dparetocounts(x = 2, lambda = lambda, xmin = xmin, xmax = xmax)
+dparetocounts <- function(x, lambda, xmin, xmax) {
+  if (xmin <= 0 || xmin >= xmax)
     stop("Parameters out of bounds in dPLB")
 
-  if (x < vreal2 || x > vreal3)
+  if (x < xmin || x > xmax)
     return(0)
 
-  if (mu != -1) {
-    density <- (mu + 1) * (x^(mu+1)) / (vreal3^(mu+1) - vreal2^(mu+1))
+  if (lambda != -1) {
+    density <- (lambda + 1) * (x^(lambda+1)) / (xmax^(lambda+1) - xmin^(lambda+1))
   } else {
-    density <- x^(-2) / (vreal2 * log(vreal3/vreal2))
+    density <- x^(-2) / (xmin * log(xmax/xmin))
   }
 
   density

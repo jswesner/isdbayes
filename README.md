@@ -37,17 +37,17 @@ devtools::install_github("jswesner/isdbayes")
 ## Fit individual samples
 
 First, simulate some power law data using `rparetocounts()`. The code
-below simulates 300 body sizes from a power law with exponent (mu) =
--1.2, xmin (vreal2) = 1, and xmax (vreal3) = 1000. The options are
-called “mu”, “vreal2”, and “vreal3” instead of “lambda”, “xmin”, and
-“xmax” to fit with the generic naming requirements of `brms` for custom
-family distributions.
+below simulates 300 body sizes from a power law with exponent (lambda) =
+-1.2, xmin (xmin) = 1, and xmax (xmax) = 1000. The options are called
+“lambda”, “xmin”, and “xmax” instead of “lambda”, “xmin”, and “xmax” to
+fit with the generic naming requirements of `brms` for custom family
+distributions.
 
 ``` r
 library(isdbayes)
 
 # simulate data
-dat = tibble(x = rparetocounts(n = 300,  mu = -1.2,  vreal2 = 1, vreal3 = 1000)) %>% 
+dat = tibble(x = rparetocounts(n = 300,  lambda = -1.2,  xmin = 1, xmax = 1000)) %>% 
   mutate(xmin = min(x),
          xmax = max(x),
          counts = 1)
@@ -87,9 +87,9 @@ library(isdbayes)
 library(tidyverse)
 library(brms)
 
-x1 = rparetocounts(mu = -1.8) # `mu` is required wording from brms. in this case it means the lambda exponent of the ISD
-x2 = rparetocounts(mu = -1.5)
-x3 = rparetocounts(mu = -1.2)
+x1 = rparetocounts(lambda = -1.8) # `lambda` is required wording from brms. in this case it means the lambda exponent of the ISD
+x2 = rparetocounts(lambda = -1.5)
+x3 = rparetocounts(lambda = -1.2)
 
 isd_data = tibble(x1 = x1,
                   x2 = x2,
@@ -160,8 +160,13 @@ After the model is fit, you can use built-in functions in brms to
 perform model checking.
 
 ``` r
-pp_check(fit2, type = "dens_overlay_grouped", group = "group")
+pp_check(fit2, type = "dens_overlay_grouped", group = "group") +
+  scale_x_log10()
 #> Using 10 posterior draws for ppc type 'dens_overlay_grouped' by default.
+#> Warning in self$trans$transform(x): NaNs produced
+
+#> Warning in self$trans$transform(x): NaNs produced
+#> Warning: Removed 6 rows containing missing values (`geom_segment()`).
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
