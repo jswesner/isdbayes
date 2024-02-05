@@ -21,3 +21,4 @@ Suggests:
     tidybayes
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
+URL: https://jswesner.github.io/isdbayes/
