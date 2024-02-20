@@ -13,11 +13,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Overview
+# Overview
 
 This package allows the estimation of power law exponents using the truncated (upper and lower) Pareto distribution [@wesner2023bayesian]. Specifically, it allows users to fit Bayesian (non)-linear hierarchical models with a truncated Pareto likelihood using `brms` [@burkner2017brms]. The motivation for the package was to estimate power law exponents of ecological size spectra using individual-level body size data in a generalized mixed model framework. The likelihood for the truncated Pareto used here was described in [@edwards2020]. This package translates that likelihood into `brms`.
 
-## Installation
+# Installation
 
 This package requires installation of `brms` and `rstan`, which itself requires installation of a C++ toolchain.
 
@@ -37,7 +37,9 @@ devtools::install_github("jswesner/isdbayes")
 
 ```{r message=FALSE, warning=FALSE, include=TRUE, paged.print=FALSE}
 # load these packages
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 library(tidybayes)
 library(brms)
 library(isdbayes)

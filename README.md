@@ -2,7 +2,7 @@ isdbayes: Bayesian hierarchical modeling of size spectra
 ================
 Jeff Wesner
 
-## Overview
+# Overview
 
 This package allows the estimation of power law exponents using the
 truncated (upper and lower) Pareto distribution (Wesner et al. 2023).
@@ -14,7 +14,7 @@ generalized mixed model framework. The likelihood for the truncated
 Pareto used here was described in (Edwards et al. 2020). This package
 translates that likelihood into `brms`.
 
-## Installation
+# Installation
 
 This package requires installation of `brms` and `rstan`, which itself
 requires installation of a C++ toolchain.
@@ -36,7 +36,9 @@ devtools::install_github("jswesner/isdbayes")
 
 ``` r
 # load these packages
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 library(tidybayes)
 library(brms)
 library(isdbayes)
@@ -50,6 +52,7 @@ below simulates 300 body sizes from a power law with exponent lambda =
 
 ``` r
 # simulate data
+
 dat = tibble(x = rparetocounts(n = 300,  lambda = -1.2,  xmin = 1, xmax = 1000)) |> 
   mutate(xmin = min(x),
          xmax = max(x),
