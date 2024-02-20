@@ -38,6 +38,7 @@ devtools::install_github("jswesner/isdbayes")
 # load these packages
 library(dplyr)
 library(tidyr)
+library(here)
 library(ggplot2)
 library(tidybayes)
 library(brms)
@@ -128,11 +129,11 @@ fit2 = brm(x | vreal(counts, xmin, xmax) ~ group,
 posts_group = fit2$data |> 
   distinct(group, xmin, xmax) |> 
   mutate(counts = 1) |> 
-  tidybayes::add_epred_draws(fit2, re_formula = NA) 
+  add_epred_draws(fit2, re_formula = NA) 
 
 posts_group |> 
   ggplot(aes(x = group, y = .epred)) + 
-  tidybayes::stat_halfeye(scale = 0.2) + 
+  stat_halfeye(scale = 0.2) + 
   geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
 ```
 
@@ -154,11 +155,11 @@ fit3 = brm(x | vreal(counts, xmin, xmax) ~ (1|group),
 posts_varint = fit3$data |> 
   distinct(group, xmin, xmax) |> 
   mutate(counts = 1) |> 
-  tidybayes::add_epred_draws(fit3, re_formula = NULL) 
+  add_epred_draws(fit3, re_formula = NULL) 
 
 posts_varint |> 
   ggplot(aes(x = group, y = .epred)) + 
-  tidybayes::stat_halfeye(scale = 0.2) + 
+  stat_halfeye(scale = 0.2) + 
   geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
 ```
 
@@ -187,9 +188,8 @@ pp_check(fit2, type = "dens_overlay_grouped", group = "group") +
 
 <div id="ref-burkner2017brms" class="csl-entry">
 
-Bürkner, Paul-Christian. 2017. “Brms: An r Package for Bayesian
-Multilevel Models Using Stan.” *Journal of Statistical Software* 80:
-1–28.
+Bürkner, P. C. 2017. “Brms: An r Package for Bayesian Multilevel Models
+Using Stan.” *Journal of Statistical Software* 80: 1–28.
 
 </div>
 
@@ -204,9 +204,8 @@ When Fitting Size Spectra.” *Marine Ecology Progress Series* 636
 
 <div id="ref-wesner2023bayesian" class="csl-entry">
 
-Wesner, Jeff S, Justin PF Pomeranz, James R Junker, and Vojsava Gjoni.
-2023. “Bayesian Hierarchical Modeling of Size Spectra.” *bioRxiv*,
-2023–02.
+Wesner, J. S, J. P. F. Pomeranz, J. R. Junker, and V. Gjoni. 2023.
+“Bayesian Hierarchical Modeling of Size Spectra.” *bioRxiv*, 2023–02.
 
 </div>
 
