@@ -34,20 +34,23 @@ devtools::install_github("jswesner/isdbayes")
 
 # Examples
 
+``` r
+# load these packages
+library(tidyverse)
+library(tidybayes)
+library(brms)
+library(isdbayes)
+```
+
 ## Fit individual samples
 
 First, simulate some power law data using `rparetocounts()`. The code
-below simulates 300 body sizes from a power law with exponent (lambda) =
--1.2, xmin (xmin) = 1, and xmax (xmax) = 1000. The options are called
-“lambda”, “xmin”, and “xmax” instead of “lambda”, “xmin”, and “xmax” to
-fit with the generic naming requirements of `brms` for custom family
-distributions.
+below simulates 300 body sizes from a power law with exponent lambda =
+-1.2, xmin = 1, and xmax = 1000.
 
 ``` r
-library(isdbayes)
-
 # simulate data
-dat = tibble(x = rparetocounts(n = 300,  lambda = -1.2,  xmin = 1, xmax = 1000)) %>% 
+dat = tibble(x = rparetocounts(n = 300,  lambda = -1.2,  xmin = 1, xmax = 1000)) |> 
   mutate(xmin = min(x),
          xmax = max(x),
          counts = 1)
@@ -64,10 +67,17 @@ either be analyzed with each body size assumed to be unique where counts
 counts = {2, 1, 2}. The latter is a common format when there is a
 density estimate associated with counts or a sampling effort.
 
-Next estimate the power law exponent using `brms`.
+Next estimate the power law exponent using `brms`. The model below
+(`fit1`) is an intercept only model, where x are the body sizes and
+counts, xmin, and xmax are included in `vreal()`. The use of `vreal` has
+nothing to do with the model per se. It is simply required wording from
+`brms` when including custom families. Similarly, `stanvars` is required
+wording that contains the custom likelihood parameters. As long as
+`isdbayes` is loaded, then `stanvars = stanvars` will work. It will stay
+the same regardless of changes to the model structure (like new
+predictors or varyaing intercepts).
 
 ``` r
-library(brms)
 
 fit1 = brm(x | vreal(counts, xmin, xmax) ~ 1, 
           data = dat,
@@ -83,9 +93,6 @@ predictors, see below.
 ## Simulate multiple size distributions
 
 ``` r
-library(isdbayes)
-library(tidyverse)
-library(brms)
 
 x1 = rparetocounts(lambda = -1.8) # `lambda` is required wording from brms. in this case it means the lambda exponent of the ISD
 x2 = rparetocounts(lambda = -1.5)
@@ -93,12 +100,12 @@ x3 = rparetocounts(lambda = -1.2)
 
 isd_data = tibble(x1 = x1,
                   x2 = x2,
-                  x3 = x3) %>% 
-  pivot_longer(cols = everything(), names_to = "group", values_to = "x") %>% 
-  group_by(group) %>% 
+                  x3 = x3) |> 
+  pivot_longer(cols = everything(), names_to = "group", values_to = "x") |> 
+  group_by(group) |> 
   mutate(xmin = min(x),
-         xmax = max(x)) %>% 
-  group_by(group, x) %>% 
+         xmax = max(x)) |> 
+  group_by(group, x) |> 
   add_count(name = "counts")
 ```
 
@@ -115,12 +122,12 @@ fit2 = brm(x | vreal(counts, xmin, xmax) ~ group,
 ## Plot group posteriors
 
 ``` r
-posts_group = fit2$data %>% 
-  distinct(group, xmin, xmax) %>% 
-  mutate(counts = 1) %>% 
+posts_group = fit2$data |> 
+  distinct(group, xmin, xmax) |> 
+  mutate(counts = 1) |> 
   tidybayes::add_epred_draws(fit2, re_formula = NA) 
 
-posts_group %>% 
+posts_group |> 
   ggplot(aes(x = group, y = .epred)) + 
   tidybayes::stat_halfeye(scale = 0.2) + 
   geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
@@ -141,12 +148,12 @@ fit3 = brm(x | vreal(counts, xmin, xmax) ~ (1|group),
 ## Plot varying intercepts
 
 ``` r
-posts_varint = fit3$data %>% 
-  distinct(group, xmin, xmax) %>% 
-  mutate(counts = 1) %>% 
+posts_varint = fit3$data |> 
+  distinct(group, xmin, xmax) |> 
+  mutate(counts = 1) |> 
   tidybayes::add_epred_draws(fit3, re_formula = NULL) 
 
-posts_varint %>% 
+posts_varint |> 
   ggplot(aes(x = group, y = .epred)) + 
   tidybayes::stat_halfeye(scale = 0.2) + 
   geom_hline(yintercept = c(-1.8, -1.5, -1.2)) # known lambdas
@@ -185,10 +192,10 @@ Multilevel Models Using Stan.” *Journal of Statistical Software* 80:
 
 <div id="ref-edwards2020" class="csl-entry">
 
-Edwards, Am, Jpw Robinson, Jl Blanchard, Jk Baum, and Mj Plank. 2020.
-“Accounting for the Bin Structure of Data Removes Bias When Fitting Size
-Spectra.” *Marine Ecology Progress Series* 636 (February): 19–33.
-<https://doi.org/10.3354/meps13230>.
+Edwards, A. M., J. P. W. Robinson, J. L. Blanchard, J. K. Baum, and M.
+J. Plank. 2020. “Accounting for the Bin Structure of Data Removes Bias
+When Fitting Size Spectra.” *Marine Ecology Progress Series* 636
+(February): 19–33. <https://doi.org/10.3354/meps13230>.
 
 </div>
 

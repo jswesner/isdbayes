@@ -14,7 +14,7 @@ LazyData: true
 Imports:
     brms,
     dplyr,
-    magrittr
+    tidyr
 Suggests:
     knitr,
     rmarkdown,
