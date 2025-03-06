@@ -5,7 +5,7 @@ Jeff Wesner
 # Overview
 
 This package allows the estimation of power law exponents using the
-truncated (upper and lower) Pareto distribution (Wesner et al. 2023).
+truncated (upper and lower) Pareto distribution (Wesner et al. 2024).
 Specifically, it allows users to fit Bayesian (non)-linear hierarchical
 models with a truncated Pareto likelihood using `brms` (Bürkner 2017).
 The motivation for the package was to estimate power law exponents of
@@ -80,7 +80,7 @@ nothing to do with the model per se. It is simply required wording from
 wording that contains the custom likelihood parameters. As long as
 `isdbayes` is loaded, then `stanvars = stanvars` will work. It will stay
 the same regardless of changes to the model structure (like new
-predictors or varyaing intercepts).
+predictors or varying intercepts).
 
 ``` r
 
@@ -172,41 +172,93 @@ After the model is fit, you can use built-in functions in brms to
 perform model checking.
 
 ``` r
-pp_check(fit2, type = "dens_overlay_grouped", group = "group") +
-  scale_x_log10()
-#> Using 10 posterior draws for ppc type 'dens_overlay_grouped' by default.
-#> Warning in self$trans$transform(x): NaNs produced
-
-#> Warning in self$trans$transform(x): NaNs produced
-#> Warning: Removed 6 rows containing missing values (`geom_segment()`).
+pp_check(fit2)
+#> Using 10 posterior draws for ppc type 'dens_overlay' by default.
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
+``` r
+
+pp_check(fit2, type = "dens_overlay_grouped", group = "group") +
+  scale_x_log10()
+#> Using 10 posterior draws for ppc type 'dens_overlay_grouped' by default.
+#> Warning in transformation$transform(x): NaNs produced
+#> Warning in transformation$transform(x): NaNs produced
+#> Warning: Removed 6 rows containing missing values or values outside the scale range
+#> (`geom_segment()`).
+```
+
+![](README_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
+
+## Visualize ISD
+
+This code extracts the cumulative probabilities using `pparetocounts()`
+and the plots them over raw data. Note that the raw data probabilities
+are simply estimates for visualization purposes. These plots are typical
+in studies of the ISD and are visually similar to plots of log-abundance
+vs log-size, making them more familiar to readers (maybe).
+
+``` r
+# 1) sort raw data
+d = fit1$data |>
+  arrange(-x) |> 
+  mutate(order = row_number(),
+         y_raw_prob = order/max(order)) # convert to 0-1 scale
+
+# 2) data grid to sample over
+data_grid = d %>%
+  distinct(xmin, xmax) %>% 
+  expand_grid(x = 2^seq(log2(min(d$x)), log2(max(d$x)), length.out = 30)) |> # sequence is log 2 to ensure equal logarithmic spacing
+  mutate(counts = 1) # This is a default. Even if counts are >1 inthe raw data, make them = 1 here.
+
+# 3) extract posteriors
+isd_posts = data_grid |> 
+  tidybayes::add_epred_draws(fit1)
+
+# 4) get cumulative probabilities from posteriors
+isd_lines = isd_posts |> 
+  mutate(y_prob = pparetocounts(x = x, xmin = xmin ,xmax = xmax, lambda = .epred))
+
+# 5) plot raw vs posterior samples
+isd_lines |> 
+  filter(.draw <= 100) |> # limits to the first 100 draws. Change as needed or use a summary to plot instead of individual lines
+  ggplot(aes(x = x, y = y_prob)) + 
+  geom_line(aes(group = .draw), alpha = 0.3) +
+  geom_point(data = d, aes(y = y_raw_prob),
+             shape = 21, fill = "white", color = "black") +
+  labs(y = "P(X >= x)")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
 ## References
 
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0">
 
 <div id="ref-burkner2017brms" class="csl-entry">
 
-Bürkner, P. C. 2017. “Brms: An r Package for Bayesian Multilevel Models
-Using Stan.” *Journal of Statistical Software* 80: 1–28.
+Bürkner, Paul-Christian. 2017. “Brms: An r Package for Bayesian
+Multilevel Models Using Stan.” *Journal of Statistical Software* 80:
+1–28.
 
 </div>
 
 <div id="ref-edwards2020" class="csl-entry">
 
-Edwards, A. M., J. P. W. Robinson, J. L. Blanchard, J. K. Baum, and M.
-J. Plank. 2020. “Accounting for the Bin Structure of Data Removes Bias
-When Fitting Size Spectra.” *Marine Ecology Progress Series* 636
-(February): 19–33. <https://doi.org/10.3354/meps13230>.
+Edwards, Am, Jpw Robinson, Jl Blanchard, Jk Baum, and Mj Plank. 2020.
+“Accounting for the Bin Structure of Data Removes Bias When Fitting Size
+Spectra.” *Marine Ecology Progress Series* 636 (February): 19–33.
+<https://doi.org/10.3354/meps13230>.
 
 </div>
 
-<div id="ref-wesner2023bayesian" class="csl-entry">
+<div id="ref-wesner2024bayesian" class="csl-entry">
 
-Wesner, J. S, J. P. F. Pomeranz, J. R. Junker, and V. Gjoni. 2023.
-“Bayesian Hierarchical Modeling of Size Spectra.” *bioRxiv*, 2023–02.
+Wesner, Jeff S, Justin PF Pomeranz, James R Junker, and Vojsava Gjoni.
+2024. “Bayesian Hierarchical Modelling of Size Spectra.” *Methods in
+Ecology and Evolution* 15 (5): 856–67.
 
 </div>
 
