@@ -52,7 +52,7 @@
 <div class="section level1">
 <h1 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h1>
-<p>This package allows the estimation of power law exponents using the truncated (upper and lower) Pareto distribution (Wesner et al. 2023). Specifically, it allows users to fit Bayesian (non)-linear hierarchical models with a truncated Pareto likelihood using <code>brms</code> (Bürkner 2017). The motivation for the package was to estimate power law exponents of ecological size spectra using individual-level body size data in a generalized mixed model framework. The likelihood for the truncated Pareto used here was described in (Edwards et al. 2020). This package translates that likelihood into <code>brms</code>.</p>
+<p>This package allows the estimation of power law exponents using the truncated (upper and lower) Pareto distribution (Wesner et al. 2024). Specifically, it allows users to fit Bayesian (non)-linear hierarchical models with a truncated Pareto likelihood using <code>brms</code> (Bürkner 2017). The motivation for the package was to estimate power law exponents of ecological size spectra using individual-level body size data in a generalized mixed model framework. The likelihood for the truncated Pareto used here was described in (Edwards et al. 2020). This package translates that likelihood into <code>brms</code>.</p>
 </div>
 <div class="section level1">
 <h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -93,7 +93,7 @@
 <span>         xmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
 <span>         counts <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p>The code above simulates data from a doubly-truncated Pareto and then estimates xmin and xmax. It also adds a column for <em>counts.</em> If the data all represent unique individual masses, then this column takes a value of 1 for every body size. If the data have repeated sizes, then this column can take an integer or double of the counts or densities of those sizes. For example, data that are x = {1.9, 1.9, 1.8, 2.8, 2.8} could either be analyzed with each body size assumed to be unique where counts = {1, 1, 1, 1, 1} or it could be analyzed as x = {1.9, 1.8, 2.8} and counts = {2, 1, 2}. The latter is a common format when there is a density estimate associated with counts or a sampling effort.</p>
-<p>Next estimate the power law exponent using <code>brms</code>. The model below (<code>fit1</code>) is an intercept only model, where x are the body sizes and counts, xmin, and xmax are included in <code>vreal()</code>. The use of <code>vreal</code> has nothing to do with the model per se. It is simply required wording from <code>brms</code> when including custom families. Similarly, <code>stanvars</code> is required wording that contains the custom likelihood parameters. As long as <code>isdbayes</code> is loaded, then <code>stanvars = stanvars</code> will work. It will stay the same regardless of changes to the model structure (like new predictors or varyaing intercepts).</p>
+<p>Next estimate the power law exponent using <code>brms</code>. The model below (<code>fit1</code>) is an intercept only model, where x are the body sizes and counts, xmin, and xmax are included in <code>vreal()</code>. The use of <code>vreal</code> has nothing to do with the model per se. It is simply required wording from <code>brms</code> when including custom families. Similarly, <code>stanvars</code> is required wording that contains the custom likelihood parameters. As long as <code>isdbayes</code> is loaded, then <code>stanvars = stanvars</code> will work. It will stay the same regardless of changes to the model structure (like new predictors or varying intercepts).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">fit1</span> <span class="op">=</span> <span class="fu"><a href="https://paulbuerkner.com/brms/reference/brm.html" class="external-link">brm</a></span><span class="op">(</span><span class="va">x</span> <span class="op">|</span> <span class="fu">vreal</span><span class="op">(</span><span class="va">counts</span>, <span class="va">xmin</span>, <span class="va">xmax</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>, </span>
@@ -177,27 +177,67 @@
 </h2>
 <p>After the model is fit, you can use built-in functions in brms to perform model checking.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">fit2</span>, type <span class="op">=</span> <span class="st">"dens_overlay_grouped"</span>, group <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using 10 posterior draws for ppc type 'dens_overlay' by default.</span></span></code></pre></div>
+<p><img src="README_files/figure-gfm/unnamed-chunk-12-1.png"><!-- --></p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">fit2</span>, type <span class="op">=</span> <span class="st">"dens_overlay_grouped"</span>, group <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using 10 posterior draws for ppc type 'dens_overlay_grouped' by default.</span></span>
-<span><span class="co">#&gt; Warning in self$trans$transform(x): NaNs produced</span></span>
+<span><span class="co">#&gt; Warning in transformation$transform(x): NaNs produced</span></span>
+<span><span class="co">#&gt; Warning in transformation$transform(x): NaNs produced</span></span>
+<span><span class="co">#&gt; Warning: Removed 6 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_segment()`).</span></span></code></pre></div>
+<p><img src="README_files/figure-gfm/unnamed-chunk-12-2.png"><!-- --></p>
+</div>
+<div class="section level2">
+<h2 id="visualize-isd">Visualize ISD<a class="anchor" aria-label="anchor" href="#visualize-isd"></a>
+</h2>
+<p>This code extracts the cumulative probabilities using <code><a href="reference/pparetocounts.html">pparetocounts()</a></code> and the plots them over raw data. Note that the raw data probabilities are simply estimates for visualization purposes. These plots are typical in studies of the ISD and are visually similar to plots of log-abundance vs log-size, making them more familiar to readers (maybe).</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 1) sort raw data</span></span>
+<span><span class="va">d</span> <span class="op">=</span> <span class="va">fit1</span><span class="op">$</span><span class="va">data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>order <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>         y_raw_prob <span class="op">=</span> <span class="va">order</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">order</span><span class="op">)</span><span class="op">)</span> <span class="co"># convert to 0-1 scale</span></span>
 <span></span>
-<span><span class="co">#&gt; Warning in self$trans$transform(x): NaNs produced</span></span>
-<span><span class="co">#&gt; Warning: Removed 6 rows containing missing values (`geom_segment()`).</span></span></code></pre></div>
-<p><img src="README_files/figure-gfm/unnamed-chunk-12-1.png"><!-- --></p>
+<span><span class="co"># 2) data grid to sample over</span></span>
+<span><span class="va">data_grid</span> <span class="op">=</span> <span class="va">d</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">xmin</span>, <span class="va">xmax</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/expand_grid.html" class="external-link">expand_grid</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">2</span><span class="op">^</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fl">30</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># sequence is log 2 to ensure equal logarithmic spacing</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># This is a default. Even if counts are &gt;1 inthe raw data, make them = 1 here.</span></span>
+<span></span>
+<span><span class="co"># 3) extract posteriors</span></span>
+<span><span class="va">isd_posts</span> <span class="op">=</span> <span class="va">data_grid</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">tidybayes</span><span class="fu">::</span><span class="fu"><a href="https://mjskay.github.io/tidybayes/reference/add_predicted_draws.html" class="external-link">add_epred_draws</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 4) get cumulative probabilities from posteriors</span></span>
+<span><span class="va">isd_lines</span> <span class="op">=</span> <span class="va">isd_posts</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>y_prob <span class="op">=</span> <span class="fu"><a href="reference/pparetocounts.html">pparetocounts</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, xmin <span class="op">=</span> <span class="va">xmin</span> ,xmax <span class="op">=</span> <span class="va">xmax</span>, lambda <span class="op">=</span> <span class="va">.epred</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 5) plot raw vs posterior samples</span></span>
+<span><span class="va">isd_lines</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.draw</span> <span class="op">&lt;=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># limits to the first 100 draws. Change as needed or use a summary to plot instead of individual lines</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y_prob</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>group <span class="op">=</span> <span class="va">.draw</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y_raw_prob</span><span class="op">)</span>,</span>
+<span>             shape <span class="op">=</span> <span class="fl">21</span>, fill <span class="op">=</span> <span class="st">"white"</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"P(X &gt;= x)"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="README_files/figure-gfm/unnamed-chunk-13-1.png"><!-- --></p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-burkner2017brms" class="csl-entry">
-Bürkner, P. C. 2017. “Brms: An r Package for Bayesian Multilevel Models Using Stan.” <em>Journal of Statistical Software</em> 80: 1–28.
+Bürkner, Paul-Christian. 2017. “Brms: An r Package for Bayesian Multilevel Models Using Stan.” <em>Journal of Statistical Software</em> 80: 1–28.
 </div>
 <div id="ref-edwards2020" class="csl-entry">
-Edwards, A. M., J. P. W. Robinson, J. L. Blanchard, J. K. Baum, and M. J. Plank. 2020. “Accounting for the Bin Structure of Data Removes Bias When Fitting Size Spectra.” <em>Marine Ecology Progress Series</em> 636 (February): 19–33. <a href="https://doi.org/10.3354/meps13230" class="external-link uri">https://doi.org/10.3354/meps13230</a>.
+Edwards, Am, Jpw Robinson, Jl Blanchard, Jk Baum, and Mj Plank. 2020. “Accounting for the Bin Structure of Data Removes Bias When Fitting Size Spectra.” <em>Marine Ecology Progress Series</em> 636 (February): 19–33. <a href="https://doi.org/10.3354/meps13230" class="external-link uri">https://doi.org/10.3354/meps13230</a>.
 </div>
-<div id="ref-wesner2023bayesian" class="csl-entry">
-Wesner, J. S, J. P. F. Pomeranz, J. R. Junker, and V. Gjoni. 2023. “Bayesian Hierarchical Modeling of Size Spectra.” <em>bioRxiv</em>, 2023–02.
+<div id="ref-wesner2024bayesian" class="csl-entry">
+Wesner, Jeff S, Justin PF Pomeranz, James R Junker, and Vojsava Gjoni. 2024. “Bayesian Hierarchical Modelling of Size Spectra.” <em>Methods in Ecology and Evolution</em> 15 (5): 856–67.
 </div>
 </div>
 </div>
