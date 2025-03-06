@@ -16,7 +16,7 @@ utils::globalVariables(c("x", "vreal2", "vreal3"))
 #'
 #' @examples
 #' rparetocounts(n = 100, lambda = -1.5, xmin = 1, xmax = 2000)
-rparetocounts <- function(n = 300, lambda = -1.2, xmin = 1, xmax = 1000) {
+rparetocounts <- Vectorize(function(n = 300, lambda = -1.2, xmin = 1, xmax = 1000) {
   samples <- numeric(n)  # Create a numeric vector to store the samples
 
   # Check if parameters are within bounds for each row
@@ -34,7 +34,7 @@ rparetocounts <- function(n = 300, lambda = -1.2, xmin = 1, xmax = 1000) {
          y <- xmax^u * xmin^(1 - u))
 
   return(y)  # Return the generated samples
-}
+})
 
 
 
@@ -49,12 +49,8 @@ rparetocounts <- function(n = 300, lambda = -1.2, xmin = 1, xmax = 1000) {
 #' @export
 #'
 #' @examples
-#' xmin = 1
-#' xmax = 1000
-#' lambda = -1.5
-#'
-#' dparetocounts(x = 2, lambda = lambda, xmin = xmin, xmax = xmax)
-dparetocounts <- function(x, lambda, xmin, xmax) {
+#' dparetocounts(x = 2, lambda = -2, xmin = 1, xmax = 1000)
+dparetocounts <- Vectorize(function(x, lambda, xmin, xmax) {
   if (xmin <= 0 || xmin >= xmax)
     stop("Parameters out of bounds in dPLB")
 
@@ -68,7 +64,7 @@ dparetocounts <- function(x, lambda, xmin, xmax) {
   }
 
   density
-}
+})
 
 
 #' Bounded power law cumulative probability density function
@@ -82,12 +78,7 @@ dparetocounts <- function(x, lambda, xmin, xmax) {
 #' @export
 #'
 #' @examples
-#' x = 2,
-#' xmin = 1
-#' xmax = 1000
-#' lambda = -1.5
-#'
-#' pparetocounts(x = 2, xmin = xmin, xmax = xmax, lambda = lambda)
+#' pparetocounts(x = 2, xmin = 1, xmax = 1000, lambda = -2)
 pparetocounts <- Vectorize(function(x, xmin, xmax, lambda) {
   if (xmin <= 0 || xmin >= xmax) {
     stop("Parameters out of bounds. Is xmin negative?")

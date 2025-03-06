@@ -22,10 +22,5 @@ a numeric vector of the probability of x given lambda, xmin, and xmax.
 Bounded power law cumulative probability density function
 }
 \examples{
-x = 2,
-xmin = 1
-xmax = 1000
-lambda = -1.5
-
-pparetocounts(x = 2, xmin = xmin, xmax = xmax, lambda = lambda)
+pparetocounts(x = 2, xmin = 1, xmax = 1000, lambda = -2)
 }

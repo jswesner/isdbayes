@@ -22,9 +22,5 @@ a numeric vector of the value of the pdf given values of x, lambda, xmin, and xm
 Bounded power law probability density function
 }
 \examples{
-xmin = 1
-xmax = 1000
-lambda = -1.5
-
-dparetocounts(x = 2, lambda = lambda, xmin = xmin, xmax = xmax)
+dparetocounts(x = 2, lambda = -2, xmin = 1, xmax = 1000)
 }
