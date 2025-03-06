@@ -1,8 +1,6 @@
 
 utils::globalVariables(c("x", "vreal2", "vreal3"))
 
-
-
 #' Simulate data from a bounded power law
 #' Simulates data from a bounded power law. This is basically a vectorized version of the rPLB() function
 #' in Edwards et al. (2017) `sizeSpectra` package. The argument names are required to match the default
@@ -71,6 +69,40 @@ dparetocounts <- function(x, lambda, xmin, xmax) {
 
   density
 }
+
+
+#' Bounded power law cumulative probability density function
+#'
+#' @param x body size value
+#' @param xmin xmin: the minimum body size of the sample or the minimum possible body size
+#' @param xmax xmax: the maximum body size of the sample or the maximum possible body size
+#' @param lambda vector of lambda (the power law exponent)
+#'
+#' @returns a numeric vector of the probability of x given lambda, xmin, and xmax.
+#' @export
+#'
+#' @examples
+#' x = 2,
+#' xmin = 1
+#' xmax = 1000
+#' lambda = -1.5
+#'
+#' pparetocounts(x = 2, xmin = xmin, xmax = xmax, lambda = lambda)
+pparetocounts <- Vectorize(function(x, xmin, xmax, lambda) {
+  if (xmin <= 0 || xmin >= xmax) {
+    stop("Parameters out of bounds. Is xmin negative?")
+  }
+
+  if (x < xmin || x > xmax) {
+    return(0)
+  }
+
+  if (lambda == -1) {
+    return(1 - (log(x) - log(xmin)) / (log(xmax) - log(xmin)))
+  } else {
+    return(1 - ((x^(lambda + 1) - xmin^(lambda + 1)) / (xmax^(lambda + 1) - xmin^(lambda + 1))))
+  }
+})
 
 
 #' Generate custom log-likelihood for Stan

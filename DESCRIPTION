@@ -12,13 +12,11 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    brms,
-    dplyr,
-    tidyr
+    brms
 Suggests:
     knitr,
     rmarkdown,
     tidybayes
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 URL: https://jswesner.github.io/isdbayes/
