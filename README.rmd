@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 
 # Overview
 
-This package allows the estimation of power law exponents using the truncated (upper and lower) Pareto distribution [@wesner2023bayesian]. Specifically, it allows users to fit Bayesian (non)-linear hierarchical models with a truncated Pareto likelihood using `brms` [@burkner2017brms]. The motivation for the package was to estimate power law exponents of ecological size spectra using individual-level body size data in a generalized mixed model framework. The likelihood for the truncated Pareto used here was described in [@edwards2020]. This package translates that likelihood into `brms`.
+This package allows the estimation of power law exponents using the truncated (upper and lower) Pareto distribution [@wesner2024bayesian]. Specifically, it allows users to fit Bayesian (non)-linear hierarchical models with a truncated Pareto likelihood using `brms` [@burkner2017brms]. The motivation for the package was to estimate power law exponents of ecological size spectra using individual-level body size data in a generalized mixed model framework. The likelihood for the truncated Pareto used here was described in [@edwards2020]. This package translates that likelihood into `brms`.
 
 # Installation
 
@@ -63,7 +63,7 @@ dat = tibble(x = rparetocounts(n = 300,  lambda = -1.2,  xmin = 1, xmax = 1000))
 
 The code above simulates data from a doubly-truncated Pareto and then estimates xmin and xmax. It also adds a column for *counts.* If the data all represent unique individual masses, then this column takes a value of 1 for every body size. If the data have repeated sizes, then this column can take an integer or double of the counts or densities of those sizes. For example, data that are x = {1.9, 1.9, 1.8, 2.8, 2.8} could either be analyzed with each body size assumed to be unique where counts = {1, 1, 1, 1, 1} or it could be analyzed as x = {1.9, 1.8, 2.8} and counts = {2, 1, 2}. The latter is a common format when there is a density estimate associated with counts or a sampling effort.
 
-Next estimate the power law exponent using `brms`. The model below (`fit1`) is an intercept only model, where x are the body sizes and counts, xmin, and xmax are included in `vreal()`. The use of `vreal` has nothing to do with the model per se. It is simply required wording from `brms` when including custom families. Similarly, `stanvars` is required wording that contains the custom likelihood parameters. As long as `isdbayes` is loaded, then `stanvars = stanvars` will work. It will stay the same regardless of changes to the model structure (like new predictors or varyaing intercepts). 
+Next estimate the power law exponent using `brms`. The model below (`fit1`) is an intercept only model, where x are the body sizes and counts, xmin, and xmax are included in `vreal()`. The use of `vreal` has nothing to do with the model per se. It is simply required wording from `brms` when including custom families. Similarly, `stanvars` is required wording that contains the custom likelihood parameters. As long as `isdbayes` is loaded, then `stanvars = stanvars` will work. It will stay the same regardless of changes to the model structure (like new predictors or varying intercepts). 
 
 ```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
 fit1 = readRDS(here::here("models/fit1.rds"))
@@ -150,9 +150,45 @@ posts_varint |>
 ## Posterior predictive checks
 After the model is fit, you can use built-in functions in brms to perform model checking.
 ```{r}
+pp_check(fit2)
+
 pp_check(fit2, type = "dens_overlay_grouped", group = "group") +
   scale_x_log10()
 ```
+
+## Visualize ISD
+This code extracts the cumulative probabilities using `pparetocounts()` and the plots them over raw data. Note that the raw data probabilities are simply estimates for visualization purposes. These plots are typical in studies of the ISD and are visually similar to plots of log-abundance vs log-size, making them more familiar to readers (maybe).
+```{r}
+# 1) sort raw data
+d = fit1$data |>
+  arrange(-x) |> 
+  mutate(order = row_number(),
+         y_raw_prob = order/max(order)) # convert to 0-1 scale
+
+# 2) data grid to sample over
+data_grid = d %>%
+  distinct(xmin, xmax) %>% 
+  expand_grid(x = 2^seq(log2(min(d$x)), log2(max(d$x)), length.out = 30)) |> # sequence is log 2 to ensure equal logarithmic spacing
+  mutate(counts = 1) # This is a default. Even if counts are >1 inthe raw data, make them = 1 here.
+
+# 3) extract posteriors
+isd_posts = data_grid |> 
+  tidybayes::add_epred_draws(fit1)
+
+# 4) get cumulative probabilities from posteriors
+isd_lines = isd_posts |> 
+  mutate(y_prob = pparetocounts(x = x, xmin = xmin ,xmax = xmax, lambda = .epred))
+
+# 5) plot raw vs posterior samples
+isd_lines |> 
+  filter(.draw <= 100) |> # limits to the first 100 draws. Change as needed or use a summary to plot instead of individual lines
+  ggplot(aes(x = x, y = y_prob)) + 
+  geom_line(aes(group = .draw), alpha = 0.3) +
+  geom_point(data = d, aes(y = y_raw_prob),
+             shape = 21, fill = "white", color = "black") +
+  labs(y = "P(X >= x)")
+```
+
 
 ## References
 
