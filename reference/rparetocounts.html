@@ -77,23 +77,23 @@ arguments for custom likelihoods in `brms`.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">rparetocounts</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, lambda <span class="op">=</span> <span class="op">-</span><span class="fl">1.5</span>, xmin <span class="op">=</span> <span class="fl">1</span>, xmax <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [1]    1.178768   29.433365    5.872038    1.396189    1.014626    3.378670</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [7]    3.794612    1.946751   12.441600   16.693423   47.591301    1.455195</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [13]    1.070470    2.120151    2.717050    1.529041    2.727676    1.137142</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [19]    2.601538  467.169668    1.947416    8.816276   12.653432    1.530103</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25]  583.842965   13.217430    1.108724    4.310709    9.781806    9.361125</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [31]    1.063979    1.645844    2.006867    7.007350    3.537434    2.998524</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [37]   10.448758  189.547123    1.473902    1.610655    8.908225    3.810098</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [43]    7.200346    7.958228    1.217939   15.807304   16.320163 1011.616501</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [49]  381.758910    2.605493    3.316317    2.089439    1.454287    4.334626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]    3.735471   17.636740    1.560989   10.924259    1.140837    2.340050</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [61]   26.776223    1.864733    5.102438    2.215826    5.748863    1.513807</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [67]  185.467674    4.533688    4.574027    1.888756    3.151679    2.466035</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73]    1.057210    3.373741    2.612485    1.040418    2.507902    4.881543</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [79]   38.065691    2.569901    4.270818    5.868607    1.804272    1.948255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [85]    3.551141   98.876746    2.703023    1.595861    8.487268    1.125269</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [91] 1571.458549    1.370194    4.113752   33.489889   11.276545    1.712853</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [97]    4.621057   29.580277    1.056987    3.415282</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1]    2.601538  467.169668    1.947416    8.816276   12.653432    1.530103</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [7]  583.842965   13.217430    1.108724    4.310709    9.781806    9.361125</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13]    1.063979    1.645844    2.006867    7.007350    3.537434    2.998524</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [19]   10.448758  189.547123    1.473902    1.610655    8.908225    3.810098</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25]    7.200346    7.958228    1.217939   15.807304   16.320163 1011.616501</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [31]  381.758910    2.605493    3.316317    2.089439    1.454287    4.334626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [37]    3.735471   17.636740    1.560989   10.924259    1.140837    2.340050</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [43]   26.776223    1.864733    5.102438    2.215826    5.748863    1.513807</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [49]  185.467674    4.533688    4.574027    1.888756    3.151679    2.466035</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]    1.057210    3.373741    2.612485    1.040418    2.507902    4.881543</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61]   38.065691    2.569901    4.270818    5.868607    1.804272    1.948255</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [67]    3.551141   98.876746    2.703023    1.595861    8.487268    1.125269</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] 1571.458549    1.370194    4.113752   33.489889   11.276545    1.712853</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [79]    4.621057   29.580277    1.056987    3.415282   22.179650   23.993585</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85]    2.730964    1.616792    2.863088    8.348968    3.941433    7.961520</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [91]    4.005563   29.817819   10.605516   47.338920    1.022829   57.730732</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] 1487.049565    3.829745    2.373727   17.016984</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -105,7 +105,7 @@ arguments for custom likelihoods in `brms`.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
