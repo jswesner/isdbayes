@@ -28,7 +28,7 @@ rparetocounts <- function(n = 300, lambda = -1.2, xmin = 1, xmax = 1000) {
   # Generate n random uniform numbers
   u <- stats::runif(n)
 
-  # Generate samples based on the Pareto distribution formua
+  # Generate samples based on the Pareto distribution formula
   ifelse(lambda != -1,
          y <- (u * xmax^(lambda + 1) + (1 - u) * xmin^(lambda + 1))^(1/(lambda + 1)),
          y <- xmax^u * xmin^(1 - u))
@@ -161,7 +161,7 @@ real paretocounts_lpdf(real Y, real mu, real vreal1, real vreal2, real vreal3){
     if(mu != -1)
     return(vreal1*(log((mu+1) / ( vreal3^(mu+1) - vreal2^(mu+1))) + mu*log(Y)));
     else
-    return(vreal1*(log(log(vreal2) - log(vreal3)) + mu*log(Y)));
+    return(vreal1*-(log(log(vreal3) - log(vreal2)) + mu*log(Y)));
 }
 "
 stanvars <- brms::stanvar(scode = stan_funs, block = "functions")
@@ -211,7 +211,7 @@ paretocounts_lpdf_temp = function(Y, mu, vreal1, vreal2, vreal3){
     return(vreal1*(log((mu+1) / ( vreal3^(mu+1) - vreal2^(mu+1))) + mu*log(Y)));
   }
   if(mu == -1){
-    return(vreal1*(log(log(vreal2) - log(vreal3)) + mu*log(Y)));
+    return(vreal1*-(log(log(vreal3) - log(vreal2)) + mu*log(Y)));
   }
 }
 
