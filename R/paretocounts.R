@@ -79,7 +79,7 @@ dparetocounts <- function(x, lambda, xmin, xmax) {
 #'
 #' @examples
 #' pparetocounts(x = 2, xmin = 1, xmax = 1000, lambda = -2)
-pparetocounts <- Vectorize(function(x, xmin, xmax, lambda) {
+pparetocounts <- function(x, xmin, xmax, lambda) {
   if (xmin <= 0 || xmin >= xmax) {
     stop("Parameters out of bounds. Is xmin negative?")
   }
@@ -93,7 +93,7 @@ pparetocounts <- Vectorize(function(x, xmin, xmax, lambda) {
   } else {
     return(1 - ((x^(lambda + 1) - xmin^(lambda + 1)) / (xmax^(lambda + 1) - xmin^(lambda + 1))))
   }
-})
+}
 
 
 #' Generate custom log-likelihood for Stan
