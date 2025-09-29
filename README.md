@@ -307,10 +307,10 @@ The plot below shows these three data sets. Note the strong
 undersampling in b) as shown by the small bar on the left. In c), these
 values have been trimmed off and there is not white space below x =
 26.7. Note that the trimming can be quite large despite the relatively
-small `xmin_est` value. In this case, it removed ~5% of the data, but it
-can sometimes remove much more (such as 25 or 50%). That is usually not
-a problem as long as the remaining data has enough individuals to fit
-reliably, usually 300 or so.
+small `xmin_est` value. In this case, it removed less than 5% of the
+data, but it can sometimes remove much more (such as 25 or 50%). That is
+usually not a problem as long as the remaining data has enough
+individuals to fit reliably, usually 300 or so.
 
 ![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
@@ -324,8 +324,8 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.001362 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 13.62 seconds.
+#> Chain 1: Gradient evaluation took 0.007935 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 79.35 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -342,16 +342,16 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 2.462 seconds (Warm-up)
-#> Chain 1:                2.304 seconds (Sampling)
-#> Chain 1:                4.766 seconds (Total)
+#> Chain 1:  Elapsed Time: 6.568 seconds (Warm-up)
+#> Chain 1:                4.818 seconds (Sampling)
+#> Chain 1:                11.386 seconds (Total)
 #> Chain 1:
 fit_biased = update(fit1, newdata = biased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.000856 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 8.56 seconds.
+#> Chain 1: Gradient evaluation took 0.007153 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 71.53 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -368,16 +368,16 @@ fit_biased = update(fit1, newdata = biased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 2.211 seconds (Warm-up)
-#> Chain 1:                2.681 seconds (Sampling)
-#> Chain 1:                4.892 seconds (Total)
+#> Chain 1:  Elapsed Time: 6.406 seconds (Warm-up)
+#> Chain 1:                6.22 seconds (Sampling)
+#> Chain 1:                12.626 seconds (Total)
 #> Chain 1:
 fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.001054 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 10.54 seconds.
+#> Chain 1: Gradient evaluation took 0.001237 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 12.37 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -394,9 +394,9 @@ fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 1.171 seconds (Warm-up)
-#> Chain 1:                1.722 seconds (Sampling)
-#> Chain 1:                2.893 seconds (Total)
+#> Chain 1:  Elapsed Time: 3.269 seconds (Warm-up)
+#> Chain 1:                2.968 seconds (Sampling)
+#> Chain 1:                6.237 seconds (Total)
 #> Chain 1:
 ```
 

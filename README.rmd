@@ -257,11 +257,12 @@ biased_data_fixed = biased_data %>% filter(x >= xmin_est) %>%
 
 `xmin_est` contains the minimum value, above which the data follow a power law. In this case, it is `r round(xmin_est, 1)`. We removed all sizes below that.
 
-The plot below shows these three data sets. Note the strong undersampling in b) as shown by the small bar on the left. In c), these values have been trimmed off and there is not white space below x = `r round(xmin_est, 1)`. Note that the trimming can be quite large despite the relatively small `xmin_est` value. In this case, it removed \~5% of the data, but it can sometimes remove much more (such as 25 or 50%). That is usually not a problem as long as the remaining data has enough individuals to fit reliably, usually 300 or so.
+The plot below shows these three data sets. Note the strong undersampling in b) as shown by the small bar on the left. In c), these values have been trimmed off and there is not white space below x = `r round(xmin_est, 1)`. Note that the trimming can be quite large despite the relatively small `xmin_est` value. In this case, it removed less than 5% of the data, but it can sometimes remove much more (such as 25 or 50%). That is usually not a problem as long as the remaining data has enough individuals to fit reliably, usually 300 or so.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
 
 set.seed(20202)
+library(tidyverse)
 data_to_plot = bind_rows(unbiased_data %>% mutate(data = "a) Unbiased data\n(no undersampling)"), 
                          biased_data %>% mutate(data = "b) Biased data\n(small sizes undersampled)"),
                          mutate(biased_data_fixed %>% mutate(data = "c) Trimmed data\n(undersampled sizes removed)")))
