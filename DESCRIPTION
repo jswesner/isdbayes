@@ -20,3 +20,5 @@ Suggests:
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 URL: https://jswesner.github.io/isdbayes/
+Depends: 
+    R (>= 3.5)
