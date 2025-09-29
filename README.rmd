@@ -274,7 +274,7 @@ sample_sizes = data_to_plot %>% group_by(data) %>%
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
 
-data_to_plot %>%
+hist_plot = data_to_plot %>%
   ggplot(aes(x = x, fill = data)) + 
   geom_histogram(bins = 100, color = 'black') +
   facet_wrap(~data, scales = "free_y") +
@@ -286,6 +286,10 @@ data_to_plot %>%
   scale_y_continuous(expand = c(0, NA)) +
   geom_text(data = sample_sizes, aes(label = n),
             x = 500, y = 100)
+
+ggsave(hist_plot, file = here::here("plots/hist_plot.png"), width = 6.5, height = 3)
+
+knitr::include_graphics(here::here("plots/hist_plot.png"))
 ```
 
 *Undersampling effects on lambda*

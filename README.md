@@ -312,7 +312,7 @@ data, but it can sometimes remove much more (such as 25 or 50%). That is
 usually not a problem as long as the remaining data has enough
 individuals to fit reliably, usually 300 or so.
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+<img src="plots/hist_plot.png" width="1950" />
 
 *Undersampling effects on lambda*
 
@@ -324,8 +324,8 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.003458 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 34.58 seconds.
+#> Chain 1: Gradient evaluation took 0.001357 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 13.57 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -342,16 +342,16 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 3.689 seconds (Warm-up)
-#> Chain 1:                2.544 seconds (Sampling)
-#> Chain 1:                6.233 seconds (Total)
+#> Chain 1:  Elapsed Time: 2.106 seconds (Warm-up)
+#> Chain 1:                1.699 seconds (Sampling)
+#> Chain 1:                3.805 seconds (Total)
 #> Chain 1:
 fit_biased = update(fit1, newdata = biased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.003398 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 33.98 seconds.
+#> Chain 1: Gradient evaluation took 0.001032 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 10.32 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -368,16 +368,16 @@ fit_biased = update(fit1, newdata = biased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 3.069 seconds (Warm-up)
-#> Chain 1:                4.184 seconds (Sampling)
-#> Chain 1:                7.253 seconds (Total)
+#> Chain 1:  Elapsed Time: 1.966 seconds (Warm-up)
+#> Chain 1:                2.341 seconds (Sampling)
+#> Chain 1:                4.307 seconds (Total)
 #> Chain 1:
 fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.000578 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 5.78 seconds.
+#> Chain 1: Gradient evaluation took 0.000546 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 5.46 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -394,9 +394,9 @@ fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 2.464 seconds (Warm-up)
-#> Chain 1:                0.981 seconds (Sampling)
-#> Chain 1:                3.445 seconds (Total)
+#> Chain 1:  Elapsed Time: 1.073 seconds (Warm-up)
+#> Chain 1:                0.939 seconds (Sampling)
+#> Chain 1:                2.012 seconds (Total)
 #> Chain 1:
 ```
 
