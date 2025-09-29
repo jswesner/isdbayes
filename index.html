@@ -214,6 +214,7 @@
 <span></span>
 <span><span class="co"># 4) get cumulative probabilities from posteriors</span></span>
 <span><span class="va">isd_lines</span> <span class="op">=</span> <span class="va">isd_posts</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>y_prob <span class="op">=</span> <span class="fu"><a href="reference/pparetocounts.html">pparetocounts</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, xmin <span class="op">=</span> <span class="va">xmin</span> ,xmax <span class="op">=</span> <span class="va">xmax</span>, lambda <span class="op">=</span> <span class="va">.epred</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 5) plot raw vs posterior samples</span></span>
@@ -227,14 +228,167 @@
 <p><img src="README_files/figure-gfm/unnamed-chunk-13-1.png"><!-- --></p>
 </div>
 <div class="section level2">
+<h2 id="addressing-undersampling">Addressing Undersampling<a class="anchor" aria-label="anchor" href="#addressing-undersampling"></a>
+</h2>
+<p>In field collections of body sizes, small organisms are commonly undersampled. This contradicts that assumption of an exponential decline in frequency as body size increases and can lead to dramatically poor estimates of lambda (Clauset, Shalizi, and Newman 2009). For this reason, we strongly recommend checking for and removing undersampled small sizes. We show this below with simulated data</p>
+<p><em>Simulate data to show undersampling</em></p>
+<ol style="list-style-type: decimal">
+<li>Generate unbiased data using <code><a href="reference/rparetocounts.html">rparetocounts()</a></code>
+</li>
+</ol>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4222</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 1) sample 1000 body sizes</span></span>
+<span><span class="va">unbiased_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="reference/rparetocounts.html">rparetocounts</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">2000</span>, lambda <span class="op">=</span> <span class="op">-</span><span class="fl">1.5</span><span class="op">)</span>,</span>
+<span>                            data <span class="op">=</span> <span class="st">"unbiased data"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,</span>
+<span>         counts <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>         xmin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>         xmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Generate biased data by assigning low probabilities to small sizes and then re-sampling, weighted by the probability.</li>
+</ol>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4222</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2) create undersampling by resampling weighted by prob of occcurence</span></span>
+<span><span class="va">biased_data</span> <span class="op">=</span> <span class="va">unbiased_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fu">brms</span><span class="fu">::</span><span class="fu"><a href="https://paulbuerkner.com/brms/reference/inv_logit_scaled.html" class="external-link">inv_logit_scaled</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">20</span>, <span class="fl">10</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="co">#this assigns low probabilities to the small stuff b/c sizes are arranged by size first in step 1</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html" class="external-link">sample_n</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2000</span>, weight <span class="op">=</span> <span class="va">prob</span>, replace <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  <span class="co"># resample with small things less probable</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>data <span class="op">=</span> <span class="st">"biased data"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,</span>
+<span>         counts <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>         xmin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>         xmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Find and remove biased sizes</li>
+</ol>
+<p>How do we know if body sizes are undersampled? One option, which we recommend, is to use the <code>estimate_xmin()</code> function from the <code>poweRlaw</code> package (Gillespie 2015). It first fits the data to a power law (unbounded, but that’s OK here). Then it uses Kolmogorov-Smirnoff sampling to find the minimum size above which the data follow a power law.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/csgillespie/poweRlaw" class="external-link">poweRlaw</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># fit a continuous power law using the poweRlaw package model (note it is not a truncated Pareto, but that is OK for these purposes)</span></span>
+<span><span class="va">temp_mod</span> <span class="op">=</span> <span class="va">conpl</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">biased_data</span><span class="op">$</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># use estimate_xmin to determine the minimum size for which the data still follow a power law</span></span>
+<span><span class="va">xmin_est</span> <span class="op">=</span> <span class="fu">estimate_xmin</span><span class="op">(</span><span class="va">temp_mod</span><span class="op">)</span><span class="op">$</span><span class="va">xmin</span></span>
+<span></span>
+<span><span class="co"># remove sizes smaller than xmin</span></span>
+<span><span class="va">biased_data_fixed</span> <span class="op">=</span> <span class="va">biased_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span> <span class="va">xmin_est</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="co"># don't forget to re-set xmin...very important!</span></span></code></pre></div>
+<p><code>xmin_est</code> contains the minimum value, above which the data follow a power law. In this case, it is 26.7. We removed all sizes below that.</p>
+<p>The plot below shows these three data sets. Note the strong undersampling in b) as shown by the small bar on the left. In c), these values have been trimmed off and there is not white space below x = 26.7. Note that the trimming can be quite large despite the relatively small <code>xmin_est</code> value. In this case, it removed ~5% of the data, but it can sometimes remove much more (such as 25 or 50%). That is usually not a problem as long as the remaining data has enough individuals to fit reliably, usually 300 or so.</p>
+<p><img src="README_files/figure-gfm/unnamed-chunk-17-1.png"><!-- --></p>
+<p><em>Undersampling effects on lambda</em></p>
+<p>Now we estimate lambda from the three data sets and compare the fits.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">fit_unbiased</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fit1</span>, newdata <span class="op">=</span> <span class="va">unbiased_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1: Gradient evaluation took 0.001362 seconds</span></span>
+<span><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 13.62 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1: Adjust your expectations accordingly!</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 2.462 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                2.304 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                4.766 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:</span></span>
+<span><span class="va">fit_biased</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fit1</span>, newdata <span class="op">=</span> <span class="va">biased_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1: Gradient evaluation took 0.000856 seconds</span></span>
+<span><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 8.56 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1: Adjust your expectations accordingly!</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 2.211 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                2.681 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                4.892 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:</span></span>
+<span><span class="va">fit_trimmed</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fit1</span>, newdata <span class="op">=</span> <span class="va">biased_data_fixed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1: Gradient evaluation took 0.001054 seconds</span></span>
+<span><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 10.54 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1: Adjust your expectations accordingly!</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 1.171 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                1.722 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                2.893 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 7</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="co">#&gt;   data            n Target_lambda Estimate Est.Error `l-95% CI` `u-95% CI`</span></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;       &lt;int&gt;         &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a><span class="co">#&gt; 1 a) Unbiased  2000          -1.5    -1.49    0.0151      -1.52      -1.46</span></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="co">#&gt; 2 b) Biased    2000          -1.5    -1.15    0.0136      -1.18      -1.13</span></span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a><span class="co">#&gt; 3 c) Trimmed   1090          -1.5    -1.54    0.0322      -1.61      -1.48</span></span></code></pre></div>
+<p>This shows the target lambda value along with the posterior median <code>Estimate</code>, error, and upper an lower credible intervals. As expected, the model with unbiased data performs well, recapturing the known lambda. The model with biased data performs poorly, with the credible intervals nowhere close to the true lambda. Note the drastic mis-fit that occurs even though the biased samples occur only in the very smallest individuals (i.e., 26.7/1000 = 2.5%). After trimming those individuals out, the model again recaptures lambda well.</p>
+<p><em>What about multiple samples?</em></p>
+<p>The trimming procedure is sample-specific, not global. So if you have multiple samples, then you’ll need to run the <code>estimate_xmin</code> procedure on each sample, trim with a unique <code>xmin_est</code>, and recalculate xmin for each sample.</p>
+</div>
+<div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-burkner2017brms" class="csl-entry">
 Bürkner, Paul-Christian. 2017. “Brms: An r Package for Bayesian Multilevel Models Using Stan.” <em>Journal of Statistical Software</em> 80: 1–28.
 </div>
+<div id="ref-clauset2009power" class="csl-entry">
+Clauset, Aaron, Cosma Rohilla Shalizi, and Mark EJ Newman. 2009. “Power-Law Distributions in Empirical Data.” <em>SIAM Review</em> 51 (4): 661–703.
+</div>
 <div id="ref-edwards2020" class="csl-entry">
 Edwards, Am, Jpw Robinson, Jl Blanchard, Jk Baum, and Mj Plank. 2020. “Accounting for the Bin Structure of Data Removes Bias When Fitting Size Spectra.” <em>Marine Ecology Progress Series</em> 636 (February): 19–33. <a href="https://doi.org/10.3354/meps13230" class="external-link uri">https://doi.org/10.3354/meps13230</a>.
+</div>
+<div id="ref-Gillespie_powerlaw" class="csl-entry">
+Gillespie, Colin S. 2015. “Fitting Heavy Tailed Distributions: The <span class="nocase">poweRlaw</span> Package.” <em>Journal of Statistical Software</em> 64 (2): 1–16. <a href="https://doi.org/10.18637/jss.v064.i02" class="external-link uri">https://doi.org/10.18637/jss.v064.i02</a>.
 </div>
 <div id="ref-wesner2024bayesian" class="csl-entry">
 Wesner, Jeff S, Justin PF Pomeranz, James R Junker, and Vojsava Gjoni. 2024. “Bayesian Hierarchical Modelling of Size Spectra.” <em>Methods in Ecology and Evolution</em> 15 (5): 856–67.
