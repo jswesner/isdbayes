@@ -270,6 +270,9 @@ data_to_plot = bind_rows(unbiased_data %>% mutate(data = "a) Unbiased data\n(no 
 sample_sizes = data_to_plot %>% group_by(data) %>% 
   tally() %>% 
   mutate(n = paste("n =", n))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
 
 data_to_plot %>%
   ggplot(aes(x = x, fill = data)) + 
@@ -283,7 +286,6 @@ data_to_plot %>%
   scale_y_continuous(expand = c(0, NA)) +
   geom_text(data = sample_sizes, aes(label = n),
             x = 500, y = 100)
-  
 ```
 
 *Undersampling effects on lambda*
