@@ -312,6 +312,33 @@ data, but it can sometimes remove much more (such as 25 or 50%). That is
 usually not a problem as long as the remaining data has enough
 individuals to fit reliably, usually 300 or so.
 
+``` r
+
+set.seed(20202)
+library(tidyverse)
+data_to_plot <- bind_rows(
+  unbiased_data |> mutate(data = "a) Unbiased data\n(no undersampling)"),
+  biased_data |> mutate(data = "b) Biased data\n(small sizes undersampled)"),
+  biased_data_fixed |> mutate(data = "c) Trimmed data\n(undersampled sizes removed)")
+)
+
+sample_sizes <- data_to_plot |>
+  group_by(data) |>
+  tally() |>
+  mutate(n = paste("n =", n))
+
+ggplot(data_to_plot, aes(x = x, fill = data)) + 
+  geom_histogram(bins = 100, color = 'black') +
+  facet_wrap(~data, scales = "free_y") +
+  brms::theme_default() +
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank()) +
+  guides(fill = "none") +
+  scale_fill_brewer(type = "qual") +
+  scale_y_continuous(expand = c(0, NA)) +
+  geom_text(data = sample_sizes, aes(x = 500, y = 100, label = n))
+```
+
 ![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 *Undersampling effects on lambda*
@@ -324,8 +351,8 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.004168 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 41.68 seconds.
+#> Chain 1: Gradient evaluation took 0.001776 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 17.76 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -342,16 +369,16 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 5.231 seconds (Warm-up)
-#> Chain 1:                4.945 seconds (Sampling)
-#> Chain 1:                10.176 seconds (Total)
+#> Chain 1:  Elapsed Time: 2.158 seconds (Warm-up)
+#> Chain 1:                1.774 seconds (Sampling)
+#> Chain 1:                3.932 seconds (Total)
 #> Chain 1:
 fit_biased = update(fit1, newdata = biased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.005556 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 55.56 seconds.
+#> Chain 1: Gradient evaluation took 0.001468 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 14.68 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -368,16 +395,16 @@ fit_biased = update(fit1, newdata = biased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 5.478 seconds (Warm-up)
-#> Chain 1:                6.023 seconds (Sampling)
-#> Chain 1:                11.501 seconds (Total)
+#> Chain 1:  Elapsed Time: 2.039 seconds (Warm-up)
+#> Chain 1:                2.456 seconds (Sampling)
+#> Chain 1:                4.495 seconds (Total)
 #> Chain 1:
 fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.001413 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 14.13 seconds.
+#> Chain 1: Gradient evaluation took 0.00054 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 5.4 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -394,9 +421,9 @@ fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 2.858 seconds (Warm-up)
-#> Chain 1:                2.588 seconds (Sampling)
-#> Chain 1:                5.446 seconds (Total)
+#> Chain 1:  Elapsed Time: 1.088 seconds (Warm-up)
+#> Chain 1:                0.928 seconds (Sampling)
+#> Chain 1:                2.016 seconds (Total)
 #> Chain 1:
 ```
 
