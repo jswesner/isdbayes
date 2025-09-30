@@ -261,8 +261,7 @@ The plot below shows these three data sets. Note the strong undersampling in b) 
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
 
-set.seed(20202)
-library(tidyverse)
+
 data_to_plot = bind_rows(
   unbiased_data |> mutate(data = "a) Unbiased data\n(no undersampling)"),
   biased_data |> mutate(data = "b) Biased data\n(small sizes undersampled)"),

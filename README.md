@@ -314,8 +314,7 @@ individuals to fit reliably, usually 300 or so.
 
 ``` r
 
-set.seed(20202)
-library(tidyverse)
+
 data_to_plot = bind_rows(
   unbiased_data |> mutate(data = "a) Unbiased data\n(no undersampling)"),
   biased_data |> mutate(data = "b) Biased data\n(small sizes undersampled)"),
@@ -352,8 +351,8 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.001322 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 13.22 seconds.
+#> Chain 1: Gradient evaluation took 0.001361 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 13.61 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -370,16 +369,16 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 2.123 seconds (Warm-up)
-#> Chain 1:                1.744 seconds (Sampling)
-#> Chain 1:                3.867 seconds (Total)
+#> Chain 1:  Elapsed Time: 2.238 seconds (Warm-up)
+#> Chain 1:                1.852 seconds (Sampling)
+#> Chain 1:                4.09 seconds (Total)
 #> Chain 1:
 fit_biased = update(fit1, newdata = biased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.000912 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 9.12 seconds.
+#> Chain 1: Gradient evaluation took 0.001471 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 14.71 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -396,16 +395,16 @@ fit_biased = update(fit1, newdata = biased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 2.141 seconds (Warm-up)
-#> Chain 1:                2.343 seconds (Sampling)
-#> Chain 1:                4.484 seconds (Total)
+#> Chain 1:  Elapsed Time: 2.118 seconds (Warm-up)
+#> Chain 1:                1.814 seconds (Sampling)
+#> Chain 1:                3.932 seconds (Total)
 #> Chain 1:
 fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.000825 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 8.25 seconds.
+#> Chain 1: Gradient evaluation took 0.000802 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 8.02 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -422,18 +421,18 @@ fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 1.087 seconds (Warm-up)
-#> Chain 1:                0.966 seconds (Sampling)
-#> Chain 1:                2.053 seconds (Total)
+#> Chain 1:  Elapsed Time: 1.044 seconds (Warm-up)
+#> Chain 1:                0.998 seconds (Sampling)
+#> Chain 1:                2.042 seconds (Total)
 #> Chain 1:
 ```
 
     #> # A tibble: 3 × 7
     #>   data            n Target_lambda Estimate Est.Error `l-95% CI` `u-95% CI`
     #>   <chr>       <int>         <dbl>    <dbl>     <dbl>      <dbl>      <dbl>
-    #> 1 a) Unbiased  2000          -1.5    -1.49    0.0151      -1.52      -1.46
-    #> 2 b) Biased    2000          -1.5    -1.15    0.0136      -1.18      -1.13
-    #> 3 c) Trimmed   1090          -1.5    -1.54    0.0322      -1.61      -1.48
+    #> 1 a) Unbiased  2000          -1.5    -1.48    0.0143      -1.51      -1.46
+    #> 2 b) Biased    2000          -1.5    -1.16    0.0135      -1.18      -1.13
+    #> 3 c) Trimmed   1090          -1.5    -1.54    0.0291      -1.60      -1.48
 
 This shows the target lambda value along with the posterior median
 `Estimate`, error, and upper an lower credible intervals. As expected,
