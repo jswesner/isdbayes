@@ -283,8 +283,7 @@
 <p>The plot below shows these three data sets. Note the strong undersampling in b) as shown by the small bar on the left. In c), these values have been trimmed off and there is not white space below x = 26.7. Note that the trimming can be quite large despite the relatively small <code>xmin_est</code> value. In this case, it removed less than 5% of the data, but it can sometimes remove much more (such as 25 or 50%). That is usually not a problem as long as the remaining data has enough individuals to fit reliably, usually 300 or so.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">20202</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">data_to_plot</span> <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
 <span>  <span class="va">unbiased_data</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>data <span class="op">=</span> <span class="st">"a) Unbiased data\n(no undersampling)"</span><span class="op">)</span>,</span>
 <span>  <span class="va">biased_data</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>data <span class="op">=</span> <span class="st">"b) Biased data\n(small sizes undersampled)"</span><span class="op">)</span>,</span>
@@ -316,8 +315,8 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1: Gradient evaluation took 0.001322 seconds</span></span>
-<span><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 13.22 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1: Gradient evaluation took 0.001361 seconds</span></span>
+<span><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 13.61 seconds.</span></span>
 <span><span class="co">#&gt; Chain 1: Adjust your expectations accordingly!</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
@@ -334,16 +333,16 @@
 <span><span class="co">#&gt; Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 2.123 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                1.744 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                3.867 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 2.238 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                1.852 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                4.09 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1:</span></span>
 <span><span class="va">fit_biased</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fit1</span>, newdata <span class="op">=</span> <span class="va">biased_data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1: Gradient evaluation took 0.000912 seconds</span></span>
-<span><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 9.12 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1: Gradient evaluation took 0.001471 seconds</span></span>
+<span><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 14.71 seconds.</span></span>
 <span><span class="co">#&gt; Chain 1: Adjust your expectations accordingly!</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
@@ -360,16 +359,16 @@
 <span><span class="co">#&gt; Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 2.141 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                2.343 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                4.484 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 2.118 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                1.814 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                3.932 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1:</span></span>
 <span><span class="va">fit_trimmed</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fit1</span>, newdata <span class="op">=</span> <span class="va">biased_data_fixed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1: Gradient evaluation took 0.000825 seconds</span></span>
-<span><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 8.25 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1: Gradient evaluation took 0.000802 seconds</span></span>
+<span><span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 8.02 seconds.</span></span>
 <span><span class="co">#&gt; Chain 1: Adjust your expectations accordingly!</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
@@ -386,16 +385,16 @@
 <span><span class="co">#&gt; Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 1.087 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.966 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                2.053 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 1.044 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.998 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                2.042 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1:</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 7</span></span>
 <span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="co">#&gt;   data            n Target_lambda Estimate Est.Error `l-95% CI` `u-95% CI`</span></span>
 <span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;       &lt;int&gt;         &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co">#&gt; 1 a) Unbiased  2000          -1.5    -1.49    0.0151      -1.52      -1.46</span></span>
-<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="co">#&gt; 2 b) Biased    2000          -1.5    -1.15    0.0136      -1.18      -1.13</span></span>
-<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a><span class="co">#&gt; 3 c) Trimmed   1090          -1.5    -1.54    0.0322      -1.61      -1.48</span></span></code></pre></div>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co">#&gt; 1 a) Unbiased  2000          -1.5    -1.48    0.0143      -1.51      -1.46</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="co">#&gt; 2 b) Biased    2000          -1.5    -1.16    0.0135      -1.18      -1.13</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a><span class="co">#&gt; 3 c) Trimmed   1090          -1.5    -1.54    0.0291      -1.60      -1.48</span></span></code></pre></div>
 <p>This shows the target lambda value along with the posterior median <code>Estimate</code>, error, and upper an lower credible intervals. As expected, the model with unbiased data performs well, recapturing the known lambda. The model with biased data performs poorly, with the credible intervals nowhere close to the true lambda. Note the drastic mis-fit that occurs even though the biased samples occur only in the very smallest individuals (i.e., 26.7/1000 = 2.5%). After trimming those individuals out, the model again recaptures lambda well.</p>
 <p><em>What about multiple samples?</em></p>
 <p>The trimming procedure is sample-specific, not global. So if you have multiple samples, then you’ll need to run the <code>estimate_xmin</code> procedure on each sample, trim with a unique <code>xmin_est</code>, and recalculate xmin for each sample.</p>
