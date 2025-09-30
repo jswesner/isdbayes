@@ -263,27 +263,28 @@ The plot below shows these three data sets. Note the strong undersampling in b) 
 
 set.seed(20202)
 library(tidyverse)
-data_to_plot <- bind_rows(
+data_to_plot = bind_rows(
   unbiased_data |> mutate(data = "a) Unbiased data\n(no undersampling)"),
   biased_data |> mutate(data = "b) Biased data\n(small sizes undersampled)"),
   biased_data_fixed |> mutate(data = "c) Trimmed data\n(undersampled sizes removed)")
 )
 
-sample_sizes <- data_to_plot |>
+sample_sizes = data_to_plot |>
   group_by(data) |>
   tally() |>
   mutate(n = paste("n =", n))
 
 ggplot(data_to_plot, aes(x = x, fill = data)) + 
   geom_histogram(bins = 100, color = 'black') +
-  facet_wrap(~data, scales = "free_y") +
-  brms::theme_default() +
-  theme(axis.text.y = element_blank(),
-        axis.title.y = element_blank()) +
-  guides(fill = "none") +
-  scale_fill_brewer(type = "qual") +
-  scale_y_continuous(expand = c(0, NA)) +
-  geom_text(data = sample_sizes, aes(x = 500, y = 100, label = n))
+  # facet_wrap(~data, scales = "free_y") +
+  # brms::theme_default() +
+  # theme(axis.text.y = element_blank(),
+  #       axis.title.y = element_blank()) +
+  # guides(fill = "none") +
+  # scale_fill_brewer(type = "qual") +
+  # scale_y_continuous(expand = c(0, NA)) +
+  # geom_text(data = sample_sizes, aes(x = 500, y = 100, label = n)) +
+  NULL
 ```
 
 *Undersampling effects on lambda*
