@@ -275,14 +275,14 @@ sample_sizes = data_to_plot |>
 
 ggplot(data_to_plot, aes(x = x, fill = data)) + 
   geom_histogram(bins = 100, color = 'black') +
-  # facet_wrap(~data, scales = "free_y") +
-  # brms::theme_default() +
-  # theme(axis.text.y = element_blank(),
-  #       axis.title.y = element_blank()) +
-  # guides(fill = "none") +
-  # scale_fill_brewer(type = "qual") +
-  # scale_y_continuous(expand = c(0, NA)) +
-  # geom_text(data = sample_sizes, aes(x = 500, y = 100, label = n)) +
+  facet_wrap(~data, scales = "free_y") +
+  brms::theme_default() +
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank()) +
+  guides(fill = "none") +
+  scale_fill_brewer(type = "qual") +
+  scale_y_continuous(expand = c(0, NA)) +
+  geom_text(data = sample_sizes, aes(x = 500, y = 100, label = n)) +
   NULL
 ```
 

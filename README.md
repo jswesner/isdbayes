@@ -328,14 +328,14 @@ sample_sizes = data_to_plot |>
 
 ggplot(data_to_plot, aes(x = x, fill = data)) + 
   geom_histogram(bins = 100, color = 'black') +
-  # facet_wrap(~data, scales = "free_y") +
-  # brms::theme_default() +
-  # theme(axis.text.y = element_blank(),
-  #       axis.title.y = element_blank()) +
-  # guides(fill = "none") +
-  # scale_fill_brewer(type = "qual") +
-  # scale_y_continuous(expand = c(0, NA)) +
-  # geom_text(data = sample_sizes, aes(x = 500, y = 100, label = n)) +
+  facet_wrap(~data, scales = "free_y") +
+  brms::theme_default() +
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank()) +
+  guides(fill = "none") +
+  scale_fill_brewer(type = "qual") +
+  scale_y_continuous(expand = c(0, NA)) +
+  geom_text(data = sample_sizes, aes(x = 500, y = 100, label = n)) +
   NULL
 ```
 
@@ -351,8 +351,8 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.001361 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 13.61 seconds.
+#> Chain 1: Gradient evaluation took 0.001457 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 14.57 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -369,16 +369,16 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 2.238 seconds (Warm-up)
-#> Chain 1:                1.852 seconds (Sampling)
-#> Chain 1:                4.09 seconds (Total)
+#> Chain 1:  Elapsed Time: 2.398 seconds (Warm-up)
+#> Chain 1:                1.871 seconds (Sampling)
+#> Chain 1:                4.269 seconds (Total)
 #> Chain 1:
 fit_biased = update(fit1, newdata = biased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.001471 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 14.71 seconds.
+#> Chain 1: Gradient evaluation took 0.000992 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 9.92 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -395,16 +395,16 @@ fit_biased = update(fit1, newdata = biased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 2.118 seconds (Warm-up)
-#> Chain 1:                1.814 seconds (Sampling)
-#> Chain 1:                3.932 seconds (Total)
+#> Chain 1:  Elapsed Time: 2.081 seconds (Warm-up)
+#> Chain 1:                1.668 seconds (Sampling)
+#> Chain 1:                3.749 seconds (Total)
 #> Chain 1:
 fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.000802 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 8.02 seconds.
+#> Chain 1: Gradient evaluation took 0.001483 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 14.83 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -421,9 +421,9 @@ fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 1.044 seconds (Warm-up)
-#> Chain 1:                0.998 seconds (Sampling)
-#> Chain 1:                2.042 seconds (Total)
+#> Chain 1:  Elapsed Time: 2.503 seconds (Warm-up)
+#> Chain 1:                2.022 seconds (Sampling)
+#> Chain 1:                4.525 seconds (Total)
 #> Chain 1:
 ```
 
