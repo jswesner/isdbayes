@@ -174,8 +174,8 @@ d = fit1$data |>
          y_raw_prob = order/max(order)) # convert to 0-1 scale
 
 # 2) data grid to sample over
-data_grid = d %>%
-  distinct(xmin, xmax) %>% 
+data_grid = d |>
+  distinct(xmin, xmax) |> 
   expand_grid(x = 2^seq(log2(min(d$x)), log2(max(d$x)), length.out = 30)) |> # sequence is log 2 to ensure equal logarithmic spacing
   mutate(counts = 1) # This is a default. Even if counts are >1 inthe raw data, make them = 1 here.
 
@@ -185,7 +185,7 @@ isd_posts = data_grid |>
 
 # 4) get cumulative probabilities from posteriors
 isd_lines = isd_posts |> 
-  rowwise() %>% 
+  rowwise() |> 
   mutate(y_prob = pparetocounts(x = x, xmin = xmin ,xmax = xmax, lambda = .epred))
 
 # 5) plot raw vs posterior samples
@@ -211,9 +211,9 @@ set.seed(4222)
 
 # 1) sample 1000 body sizes
 unbiased_data <- data.frame(x = rparetocounts(n = 2000, lambda = -1.5),
-                            data = "unbiased data") %>%
-  arrange(x) %>%
-  mutate(id = 1:nrow(.),
+                            data = "unbiased data") |>
+  arrange(x) |>
+  mutate(id = 1:max(row_number()),
          counts = 1,
          xmin = min(x),
          xmax = max(x))
@@ -226,12 +226,12 @@ unbiased_data <- data.frame(x = rparetocounts(n = 2000, lambda = -1.5),
 set.seed(4222)
 
 # 2) create undersampling by resampling weighted by prob of occcurence
-biased_data = unbiased_data %>%
-  mutate(prob = brms::inv_logit_scaled(seq(-20, 10, length.out = max(row_number())))) %>% #this assigns low probabilities to the small stuff b/c sizes are arranged by size first in step 1
-  sample_n(size = 2000, weight = prob, replace = T) %>%  # resample with small things less probable
-  mutate(data = "biased data") %>%
-  arrange(x) %>%
-  mutate(id = 1:nrow(.),
+biased_data = unbiased_data |>
+  mutate(prob = brms::inv_logit_scaled(seq(-20, 10, length.out = max(row_number())))) |> #this assigns low probabilities to the small stuff b/c sizes are arranged by size first in step 1
+  sample_n(size = 2000, weight = prob, replace = T) |>  # resample with small things less probable
+  mutate(data = "biased data") |>
+  arrange(x) |>
+  mutate(id = 1:max(row_number()),
          counts = 1,
          xmin = min(x),
          xmax = max(x))
@@ -251,7 +251,7 @@ temp_mod = conpl$new(biased_data$x)
 xmin_est = estimate_xmin(temp_mod)$xmin
 
 # remove sizes smaller than xmin
-biased_data_fixed = biased_data %>% filter(x >= xmin_est) %>%
+biased_data_fixed = biased_data |> filter(x >= xmin_est) |>
   mutate(xmin = min(x)) # don't forget to re-set xmin...very important!
 ```
 
@@ -264,14 +264,14 @@ The plot below shows these three data sets. Note the strong undersampling in b) 
 set.seed(20202)
 library(tidyverse)
 data_to_plot <- bind_rows(
-  unbiased_data %>% mutate(data = "a) Unbiased data\n(no undersampling)"),
-  biased_data %>% mutate(data = "b) Biased data\n(small sizes undersampled)"),
-  biased_data_fixed %>% mutate(data = "c) Trimmed data\n(undersampled sizes removed)")
+  unbiased_data |> mutate(data = "a) Unbiased data\n(no undersampling)"),
+  biased_data |> mutate(data = "b) Biased data\n(small sizes undersampled)"),
+  biased_data_fixed |> mutate(data = "c) Trimmed data\n(undersampled sizes removed)")
 )
 
-sample_sizes <- data_to_plot %>%
-  group_by(data) %>%
-  tally() %>%
+sample_sizes <- data_to_plot |>
+  group_by(data) |>
+  tally() |>
   mutate(n = paste("n =", n))
 
 ggplot(data_to_plot, aes(x = x, fill = data)) + 
@@ -299,15 +299,15 @@ fit_trimmed = update(fit1, newdata = biased_data_fixed)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
-fit_unbiased_summary = summary(fit_unbiased)[[15]] %>% as_tibble() %>% mutate(data = "a) Unbiased", n = nrow(fit_unbiased$data))
-fit_biased_summary = summary(fit_biased)[[15]] %>% as_tibble() %>% mutate(data = "b) Biased", n = nrow(fit_biased$data))
-fit_trimmed_summary = summary(fit_trimmed)[[15]] %>% as_tibble() %>% mutate(data = "c) Trimmed", n = nrow(fit_trimmed$data))
+fit_unbiased_summary = summary(fit_unbiased)[[15]] |> as_tibble() |> mutate(data = "a) Unbiased", n = nrow(fit_unbiased$data))
+fit_biased_summary = summary(fit_biased)[[15]] |> as_tibble() |> mutate(data = "b) Biased", n = nrow(fit_biased$data))
+fit_trimmed_summary = summary(fit_trimmed)[[15]] |> as_tibble() |> mutate(data = "c) Trimmed", n = nrow(fit_trimmed$data))
 
 bind_rows(fit_unbiased_summary,
           fit_biased_summary,
-          fit_trimmed_summary) %>% 
-  select(-Rhat, -Bulk_ESS, -Tail_ESS) %>% 
-  mutate(Target_lambda = -1.5) %>% 
+          fit_trimmed_summary) |> 
+  select(-Rhat, -Bulk_ESS, -Tail_ESS) |> 
+  mutate(Target_lambda = -1.5) |> 
   select(data, n, Target_lambda, everything()) 
 ```
 

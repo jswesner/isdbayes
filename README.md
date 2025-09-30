@@ -207,8 +207,8 @@ d = fit1$data |>
          y_raw_prob = order/max(order)) # convert to 0-1 scale
 
 # 2) data grid to sample over
-data_grid = d %>%
-  distinct(xmin, xmax) %>% 
+data_grid = d |>
+  distinct(xmin, xmax) |> 
   expand_grid(x = 2^seq(log2(min(d$x)), log2(max(d$x)), length.out = 30)) |> # sequence is log 2 to ensure equal logarithmic spacing
   mutate(counts = 1) # This is a default. Even if counts are >1 inthe raw data, make them = 1 here.
 
@@ -218,7 +218,7 @@ isd_posts = data_grid |>
 
 # 4) get cumulative probabilities from posteriors
 isd_lines = isd_posts |> 
-  rowwise() %>% 
+  rowwise() |> 
   mutate(y_prob = pparetocounts(x = x, xmin = xmin ,xmax = xmax, lambda = .epred))
 
 # 5) plot raw vs posterior samples
@@ -251,9 +251,9 @@ set.seed(4222)
 
 # 1) sample 1000 body sizes
 unbiased_data <- data.frame(x = rparetocounts(n = 2000, lambda = -1.5),
-                            data = "unbiased data") %>%
-  arrange(x) %>%
-  mutate(id = 1:nrow(.),
+                            data = "unbiased data") |>
+  arrange(x) |>
+  mutate(id = 1:max(row_number()),
          counts = 1,
          xmin = min(x),
          xmax = max(x))
@@ -266,12 +266,12 @@ unbiased_data <- data.frame(x = rparetocounts(n = 2000, lambda = -1.5),
 set.seed(4222)
 
 # 2) create undersampling by resampling weighted by prob of occcurence
-biased_data = unbiased_data %>%
-  mutate(prob = brms::inv_logit_scaled(seq(-20, 10, length.out = max(row_number())))) %>% #this assigns low probabilities to the small stuff b/c sizes are arranged by size first in step 1
-  sample_n(size = 2000, weight = prob, replace = T) %>%  # resample with small things less probable
-  mutate(data = "biased data") %>%
-  arrange(x) %>%
-  mutate(id = 1:nrow(.),
+biased_data = unbiased_data |>
+  mutate(prob = brms::inv_logit_scaled(seq(-20, 10, length.out = max(row_number())))) |> #this assigns low probabilities to the small stuff b/c sizes are arranged by size first in step 1
+  sample_n(size = 2000, weight = prob, replace = T) |>  # resample with small things less probable
+  mutate(data = "biased data") |>
+  arrange(x) |>
+  mutate(id = 1:max(row_number()),
          counts = 1,
          xmin = min(x),
          xmax = max(x))
@@ -296,7 +296,7 @@ temp_mod = conpl$new(biased_data$x)
 xmin_est = estimate_xmin(temp_mod)$xmin
 
 # remove sizes smaller than xmin
-biased_data_fixed = biased_data %>% filter(x >= xmin_est) %>%
+biased_data_fixed = biased_data |> filter(x >= xmin_est) |>
   mutate(xmin = min(x)) # don't forget to re-set xmin...very important!
 ```
 
@@ -324,8 +324,8 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.001834 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 18.34 seconds.
+#> Chain 1: Gradient evaluation took 0.004168 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 41.68 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -342,16 +342,16 @@ fit_unbiased = update(fit1, newdata = unbiased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 2.126 seconds (Warm-up)
-#> Chain 1:                1.698 seconds (Sampling)
-#> Chain 1:                3.824 seconds (Total)
+#> Chain 1:  Elapsed Time: 5.231 seconds (Warm-up)
+#> Chain 1:                4.945 seconds (Sampling)
+#> Chain 1:                10.176 seconds (Total)
 #> Chain 1:
 fit_biased = update(fit1, newdata = biased_data)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.00089 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 8.9 seconds.
+#> Chain 1: Gradient evaluation took 0.005556 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 55.56 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -368,16 +368,16 @@ fit_biased = update(fit1, newdata = biased_data)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 2.086 seconds (Warm-up)
-#> Chain 1:                2.352 seconds (Sampling)
-#> Chain 1:                4.438 seconds (Total)
+#> Chain 1:  Elapsed Time: 5.478 seconds (Warm-up)
+#> Chain 1:                6.023 seconds (Sampling)
+#> Chain 1:                11.501 seconds (Total)
 #> Chain 1:
 fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 0.000524 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 5.24 seconds.
+#> Chain 1: Gradient evaluation took 0.001413 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 14.13 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -394,9 +394,9 @@ fit_trimmed = update(fit1, newdata = biased_data_fixed)
 #> Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)
 #> Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)
 #> Chain 1: 
-#> Chain 1:  Elapsed Time: 1.035 seconds (Warm-up)
-#> Chain 1:                0.883 seconds (Sampling)
-#> Chain 1:                1.918 seconds (Total)
+#> Chain 1:  Elapsed Time: 2.858 seconds (Warm-up)
+#> Chain 1:                2.588 seconds (Sampling)
+#> Chain 1:                5.446 seconds (Total)
 #> Chain 1:
 ```
 
